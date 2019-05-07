@@ -1,4 +1,4 @@
-#include "qtrestwrapper.h"
+#include "qrestwrapper.h"
 #include "qrestwrapperurlinterceptor.h"
 
 #include <QWebEngineUrlRequestInfo>
@@ -21,8 +21,11 @@ using QtRestWrapper::QRestWrapper;
 
 QRestWrapper::QRestWrapper(QObject *parent) :
     QObject(parent),
+    m_networkAccessManager(),
     m_cookieJar(&this->m_networkAccessManager),
-    m_urlInterceptor(QSharedPointer<QRestWrapperUrlInterceptor>::create())
+    m_urlInterceptor(QSharedPointer<QRestWrapperUrlInterceptor>::create()),
+    m_view(nullptr),
+    m_page(nullptr)
 {
     // set the this pointer to the url interceptor,
     // that it can read the filter lists
@@ -35,6 +38,10 @@ QRestWrapper::QRestWrapper(QObject *parent) :
 
 QRestWrapper::~QRestWrapper()
 {
+    if(m_view != nullptr) {
+        m_view->deleteLater();
+        m_view = nullptr;
+    }
 }
 
 void QRestWrapper::setStoragePath(const QString &path)
@@ -57,7 +64,7 @@ void QRestWrapper::authenticate()
 {
     m_isAuthenticated = false;
     initWebEngineView();
-    addWebView(this->m_view.get());
+    addWebView(this->m_view);
     this->m_view->setUrl(this->m_applicationUrl);
     this->m_view->show();
     this->m_cookieStore = this->m_page->profile()->cookieStore();
@@ -275,8 +282,8 @@ void QRestWrapper::checkUrlForAuthentication(const QUrl &url)
         if(!this->m_isAuthenticated && authenticationCheck(url)) {
             this->m_networkAccessManager.setCookieJar(&m_cookieJar);
             this->m_isAuthenticated = true;
-            disconnect(this->m_view.get(), &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
-            removeWebView(this->m_view.get());
+            disconnect(this->m_view, &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
+            removeWebView(this->m_view);
             this->m_view->deleteLater();
             this->m_view = nullptr;
             this->m_page->deleteLater();
@@ -290,8 +297,8 @@ void QRestWrapper::checkUrlForAuthentication(const QUrl &url)
         if (!this->m_isAuthenticated && match.hasMatch()) {
             this->m_networkAccessManager.setCookieJar(&m_cookieJar);
             this->m_isAuthenticated = true;
-            disconnect(this->m_view.get(), &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
-            removeWebView(this->m_view.get());
+            disconnect(this->m_view, &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
+            removeWebView(this->m_view);
             this->m_view->deleteLater();
             this->m_view = nullptr;
             this->m_page->deleteLater();
@@ -365,13 +372,13 @@ void QRestWrapper::waitForCustomRequest(QNetworkReply *reply)
 
 void QRestWrapper::initWebEngineView()
 {
-    this->m_view = QSharedPointer<QWebEngineView>::create();
+    this->m_view = new QWebEngineView();
     this->m_view->setEnabled(true);
     QWebEngineProfile* defaultProfile = QWebEngineProfile::defaultProfile();
     connect(this->m_urlInterceptor.get(), &QRestWrapperUrlInterceptor::checkAuthenticationPage, this, &QRestWrapper::checkUrlForAuthentication);
     defaultProfile->setRequestInterceptor(this->m_urlInterceptor.get());
     defaultProfile->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
-    this->m_page = new QWebEnginePage(defaultProfile, this->m_view.get());
+    this->m_page = new QWebEnginePage(defaultProfile, this->m_view);
     this->m_page->settings()->setAttribute(QWebEngineSettings::AutoLoadImages, false);
     this->m_page->settings()->setAttribute(QWebEngineSettings::AutoLoadIconsForPage, false);
     if(m_storagePath.length() <= 0) {
@@ -385,7 +392,7 @@ void QRestWrapper::initWebEngineView()
     this->m_cookieStore = this->m_page->profile()->cookieStore();
     connect(m_cookieStore, &QWebEngineCookieStore::cookieAdded, &m_cookieJar, &QRestWrapperCookieJar::insertCookie);
     connect(m_cookieStore, &QWebEngineCookieStore::cookieRemoved, &m_cookieJar, &QRestWrapperCookieJar::deleteCookie);
-    connect(this->m_view.get(), &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
+    connect(this->m_view, &QWebEngineView::urlChanged, this, &QRestWrapper::checkUrlForAuthentication);
     initClientCertificateSelection();
 }
 

@@ -23,6 +23,7 @@ class QWebEnginePage;
 namespace QtRestWrapper {
 
 class QRestWrapperUrlInterceptor;
+class QRestWrapperTest;
 
 class QTRESTWRAPPERSHARED_EXPORT QRestWrapper : public QObject
 {
@@ -114,8 +115,13 @@ private:
     void cleanupRequest(const QString &registeredString);
 
 private:
-    QWebEnginePage *m_page { nullptr };
-    QSharedPointer<QWebEngineView> m_view;
+    QNetworkAccessManager m_networkAccessManager;
+    QMap<QString, QPair<QString, QSharedPointer<QByteArray>>> m_registeredPayloadData;
+    QMap<QString, QMap<QString, QString>> m_registeredCustomHeaders;
+
+private:
+    QWebEnginePage *m_page;
+    QWebEngineView *m_view;
     QWebEngineCookieStore *m_cookieStore { nullptr };
     QRestWrapperCookieJar m_cookieJar;
     QUrl m_authenticationTestUrl { "" };
@@ -129,12 +135,10 @@ protected:
     QVector<QString> m_forbiddenUrlPatterns;
 
 private:
-    QNetworkAccessManager m_networkAccessManager;
-    QMap<QString, QPair<QString, QSharedPointer<QByteArray>>> m_registeredPayloadData;
-    QMap<QString, QMap<QString, QString>> m_registeredCustomHeaders;
+    static QVector<QString> m_generatedRandomStrings;
 
 private:
-    static QVector<QString> m_generatedRandomStrings;
+    friend class QRestWrapperTest;
 };
 
 }  // namespace QtRestWrapper

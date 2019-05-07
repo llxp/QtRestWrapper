@@ -10,12 +10,16 @@
 
 #include <tuple>
 
+#include "qtrestwrapper_global.h"
+
 template<class _This, class... _Rest>
 using QTuple = typename std::tuple<_This, _Rest...>;
 
 namespace QtRestWrapper {
 
-class QRestWrapperCookieJar : public QNetworkCookieJar
+class QRestWrapperCookieJarTest;
+
+class QTRESTWRAPPERSHARED_EXPORT QRestWrapperCookieJar : public QNetworkCookieJar
 {
 public:
     explicit QRestWrapperCookieJar(QObject *parent = nullptr);
@@ -51,6 +55,9 @@ public:
 private:
     QMap<QPair<QString, QString>, QNetworkCookie> m_cookiesBackup;
     QMap<QTuple<QString/*name*/, QString/*domain*/, QString/*path*/>, QString> m_originalCookieStrings;
+
+private:
+    friend class QRestWrapperCookieJarTest;
 };
 
 } // namespace QtRestWrapper

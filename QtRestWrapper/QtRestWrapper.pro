@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += widgets webenginewidgets
+QT       += widgets webenginewidgets core
 
 QT       -= gui
 
@@ -25,15 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        qrestwrapper.cpp \
         qrestwrappercookiejar.cpp \
-        qrestwrapperurlinterceptor.cpp \
-        qtrestwrapper.cpp
+        qrestwrapperurlinterceptor.cpp
 
 HEADERS += \
+        qrestwrapper.h \
         qrestwrappercookiejar.h \
         qrestwrapperurlinterceptor.h \
-        qtrestwrapper.h \
-        qtrestwrapper_global.h 
+        qtrestwrapper_global.h
 
 unix {
     target.path = /usr/lib
