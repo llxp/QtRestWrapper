@@ -152,7 +152,7 @@ void QRestWrapper::sendRequest(const QUrl &url, const QSharedPointer<QByteArray>
 }
 
 /*
- * cookie retrieval functions
+ * cookie retrieval/deletion functions
  */
 
 void QRestWrapper::deleteCookiesByName(const QString &cookieName)
@@ -210,7 +210,7 @@ QVector<QNetworkCookie> QRestWrapper::getCookiesByNameAndDomainAndPath(const QSt
     return m_cookieJar.getCookiesByNameAndDomainAndPath(cookieName, cookieDomain, cookiePath);
 }
 
-QMap<QPair<QString, QString>, QNetworkCookie> QRestWrapper::getAllCookies() const
+QVector<QNetworkCookie> QRestWrapper::getAllCookies() const
 {
     return m_cookieJar.getAllCookies();
 }

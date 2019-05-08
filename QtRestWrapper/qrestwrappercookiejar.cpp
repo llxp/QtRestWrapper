@@ -12,8 +12,10 @@ QRestWrapperCookieJar::QRestWrapperCookieJar(QObject *parent) : QNetworkCookieJa
 
 bool QRestWrapperCookieJar::insertCookie(const QNetworkCookie &cookie)
 {
-    this->m_cookiesBackup[QPair<QString, QString>(cookie.name(), cookie.domain())] = cookie;
-    this->m_originalCookieStrings[std::make_tuple<QString, QString, QString>(cookie.name(), cookie.domain(), cookie.path())] = cookie.toRawForm();
+    if(getCookiesByNameAndDomainAndPath(cookie.name(), cookie.domain(), cookie.path()).size() <= 0) {
+        this->m_cookiesBackup[QTuple<QString/*name*/, QString/*domain*/, QString/*path*/>(cookie.name(), cookie.domain(), cookie.path())] = cookie;
+        this->m_originalCookieStrings[std::make_tuple<QString, QString, QString>(cookie.name(), cookie.domain(), cookie.path())] = cookie.toRawForm();
+    }
     return QNetworkCookieJar::insertCookie(cookie);
 }
 
@@ -24,7 +26,10 @@ bool QRestWrapperCookieJar::deleteCookie(const QNetworkCookie &cookie)
 
 bool QRestWrapperCookieJar::updateCookie(const QNetworkCookie &cookie)
 {
-    this->m_cookiesBackup[QPair<QString, QString>(cookie.name(), cookie.domain())] = cookie;
+    if(getCookiesByNameAndDomainAndPath(cookie.name(), cookie.domain(), cookie.path()).size() > 0) {
+        this->m_cookiesBackup[QTuple<QString/*name*/, QString/*domain*/, QString/*path*/>(cookie.name(), cookie.domain(), cookie.path())] = cookie;
+        this->m_originalCookieStrings[std::make_tuple<QString, QString, QString>(cookie.name(), cookie.domain(), cookie.path())] = cookie.toRawForm();
+    }
     return QNetworkCookieJar::updateCookie(cookie);
 }
 
@@ -42,6 +47,14 @@ void QRestWrapperCookieJar::deleteCookiesByName(const QString &cookieName)
             ++it;
         }
     }
+
+    for (auto it = m_originalCookieStrings.begin(); it != m_originalCookieStrings.end();) {
+        if(std::get<0>(it.key()) == cookieName) {
+            it = m_originalCookieStrings.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void QRestWrapperCookieJar::deleteCookiesByDomain(const QString &cookieDomain)
@@ -49,6 +62,14 @@ void QRestWrapperCookieJar::deleteCookiesByDomain(const QString &cookieDomain)
     for (auto it = m_cookiesBackup.begin(); it != m_cookiesBackup.end();) {
         if(it->domain() == cookieDomain) {
             it = m_cookiesBackup.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    for (auto it = m_originalCookieStrings.begin(); it != m_originalCookieStrings.end();) {
+        if(std::get<1>(it.key()) == cookieDomain) {
+            it = m_originalCookieStrings.erase(it);
         } else {
             ++it;
         }
@@ -64,6 +85,14 @@ void QRestWrapperCookieJar::deleteCookiesByPath(const QString &cookiePath)
             ++it;
         }
     }
+
+    for (auto it = m_originalCookieStrings.begin(); it != m_originalCookieStrings.end();) {
+        if(std::get<2>(it.key()) == cookiePath) {
+            it = m_originalCookieStrings.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void QRestWrapperCookieJar::deleteCookiesByNameAndDomain(const QString &cookieName, const QString &cookieDomain)
@@ -71,6 +100,14 @@ void QRestWrapperCookieJar::deleteCookiesByNameAndDomain(const QString &cookieNa
     for (auto it = m_cookiesBackup.begin(); it != m_cookiesBackup.end();) {
         if(it->name() == cookieName && it->domain() == cookieDomain) {
             it = m_cookiesBackup.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    for (auto it = m_originalCookieStrings.begin(); it != m_originalCookieStrings.end();) {
+        if(std::get<0>(it.key()) == cookieName && std::get<1>(it.key()) == cookieDomain) {
+            it = m_originalCookieStrings.erase(it);
         } else {
             ++it;
         }
@@ -86,11 +123,20 @@ void QRestWrapperCookieJar::deleteCookiesByNameAndDomainAndPath(const QString &c
             ++it;
         }
     }
+
+    for (auto it = m_originalCookieStrings.begin(); it != m_originalCookieStrings.end();) {
+        if(std::get<0>(it.key()) == cookieName && std::get<1>(it.key()) == cookieDomain && std::get<2>(it.key()) == cookiePath) {
+            it = m_originalCookieStrings.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void QRestWrapperCookieJar::clearAllCookies()
 {
     m_cookiesBackup.clear();
+    m_originalCookieStrings.clear();
 }
 
 QVector<QNetworkCookie> QRestWrapperCookieJar::getCookiesByName(const QString &cookieName) const
@@ -148,9 +194,9 @@ QVector<QNetworkCookie> QRestWrapperCookieJar::getCookiesByNameAndDomainAndPath(
     return cookies;
 }
 
-QMap<QPair<QString, QString>, QNetworkCookie> QRestWrapperCookieJar::getAllCookies() const
+QVector<QNetworkCookie> QRestWrapperCookieJar::getAllCookies() const
 {
-    return m_cookiesBackup;
+    return m_cookiesBackup.values().toVector();
 }
 
 QVector<QString> QRestWrapperCookieJar::getOriginalCookieStringsByName(const QString &cookieName) const

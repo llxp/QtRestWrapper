@@ -65,7 +65,7 @@ public:
     QVector<QNetworkCookie> getCookiesByPath(const QString &cookiePath) const;
     QVector<QNetworkCookie> getCookiesByNameAndDomain(const QString &cookieName, const QString &cookieDomain) const;
     QVector<QNetworkCookie> getCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
-    QMap<QPair<QString, QString>, QNetworkCookie> getAllCookies() const;
+    QVector<QNetworkCookie> getAllCookies() const;
 
 public:
     QVector<QString> getOriginalCookieStringsByName(const QString &cookieName) const;
@@ -120,13 +120,13 @@ private:
     QMap<QString, QMap<QString, QString>> m_registeredCustomHeaders;
 
 private:
-    QWebEnginePage *m_page;
-    QWebEngineView *m_view;
-    QWebEngineCookieStore *m_cookieStore { nullptr };
     QRestWrapperCookieJar m_cookieJar;
+    QSharedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
+    QWebEngineView *m_view;
+    QWebEnginePage *m_page;
+    QWebEngineCookieStore *m_cookieStore { nullptr };
     QUrl m_authenticationTestUrl { "" };
     QUrl m_applicationUrl {""};
-    QSharedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
     bool m_isAuthenticated { false };
     QString m_storagePath;
 

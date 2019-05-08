@@ -42,7 +42,7 @@ public:
     QVector<QNetworkCookie> getCookiesByPath(const QString &cookiePath) const;
     QVector<QNetworkCookie> getCookiesByNameAndDomain(const QString &cookieName, const QString &cookieDomain) const;
     QVector<QNetworkCookie> getCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
-    QMap<QPair<QString, QString>, QNetworkCookie> getAllCookies() const;
+    QVector<QNetworkCookie> getAllCookies() const;
 
 public:
     QVector<QString> getOriginalCookieStringsByName(const QString &cookieName) const;
@@ -53,7 +53,7 @@ public:
     QVector<QString> getAllCookieStrings() const;
 
 private:
-    QMap<QPair<QString, QString>, QNetworkCookie> m_cookiesBackup;
+    QMap<QTuple<QString/*name*/, QString/*domain*/, QString/*path*/>, QNetworkCookie> m_cookiesBackup;
     QMap<QTuple<QString/*name*/, QString/*domain*/, QString/*path*/>, QString> m_originalCookieStrings;
 
 private:

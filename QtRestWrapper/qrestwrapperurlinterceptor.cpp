@@ -28,7 +28,7 @@ void QRestWrapperUrlInterceptor::setRestWrapper(QRestWrapper *restWrapper)
     m_restWrapper = restWrapper;
 }
 
-// testable
+// not testable, because QWebEngineUrlRequestInfo is not instantiable
 void QRestWrapperUrlInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info)
 {
     bool shouldBeAllowed = false;
