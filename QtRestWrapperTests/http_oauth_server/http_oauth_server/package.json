@@ -14,6 +14,7 @@
     "hashids": "^1.2.2",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
+    "memorystore": "^1.6.1",
     "morgan": "~1.9.1",
     "twig": "~0.10.3",
     "url": "^0.11.0",

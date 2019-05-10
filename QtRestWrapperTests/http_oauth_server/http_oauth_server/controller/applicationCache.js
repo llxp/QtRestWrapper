@@ -14,10 +14,7 @@ const fillIntrmTokenCache = (origin, id, intrmToken) => {
   intrmTokenCache[intrmToken] = [id, config.originAppNames[origin]];
 };
 const storeApplicationInCache = (origin, id, intrmToken) => {
-  console.log("origin, id, intrmToken: " + origin +" " + id + " " + intrmToken);
-  console.log(config.originAppNames[origin]);
-  console.log(config.originAppNames);
-  console.log(sessionApp);
+  //console.log("origin, id, intrmToken: " + origin +" " + id + " " + intrmToken);
   if (sessionApp[id] == null) {
     sessionApp[id] = {
       [config.originAppNames[origin]]: true
@@ -27,7 +24,22 @@ const storeApplicationInCache = (origin, id, intrmToken) => {
     sessionApp[id][config.originAppNames[origin]] = true;
     fillIntrmTokenCache(origin, id, intrmToken);
   }
-  console.log({ ...sessionApp }, { ...sessionUser }, { intrmTokenCache });
+  //console.log({ ...sessionApp }, { ...sessionUser }, { intrmTokenCache });
+};
+
+const fillValidTokenCache = (origin, id, bearerToken) => {
+  validTokens[bearerToken] = [id, config.originAppNames[origin]];
+};
+const storeBearerTokenInCache = (origin, id, bearerToken) => {
+  if (sessionApp[id] == null) {
+    sessionApp[id] = {
+      [config.originAppNames[origin]]: true
+    };
+    fillValidTokenCache(origin, id, bearerToken);
+  } else {
+    sessionApp[id][config.originAppNames[origin]] = true;
+    fillValidTokenCache(origin, id, bearerToken);
+  }
 };
 
 module.exports = {
@@ -35,5 +47,6 @@ module.exports = {
   sessionApp: sessionApp,
   intrmTokenCache: intrmTokenCache,
   storeApplicationInCache: storeApplicationInCache,
-  validTokens: validTokens
+  validTokens: validTokens,
+  storeBearerTokenInCache: storeBearerTokenInCache
 };

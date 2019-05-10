@@ -5,23 +5,44 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require("express-session");
 var cookieSession = require('cookie-session');
+var MemoryStore = require('memorystore')(session);
 
 const doCertLogin = require("./controller/doCertLogin");
 
 var app = express();
 
-app.use(
+/*app.use(
   cookieSession({
-    /*secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-    name: "session",
-    secure: true*/
+    //secret: "keyboard cat",
+    //resave: false,
+    //saveUninitialized: true,
+    //name: "session",
+    //secure: true
     name: 'session',
-    keys: [/* secret keys */"keyboard cat"],
+    keys: ["keyboard cat"],
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   })
+);*/
+
+app.use(
+  /*cookieSession({
+    name: 'session2',
+    keys: ["keyboard cat2"],
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  })*/
+    session({
+        store: new MemoryStore({
+            checkPeriod: 86400000
+        }),
+        secret: "keyboard cat1",
+        resave: true,
+        saveUninitialized: true,
+        name: "session1",
+        //secure: false,
+        cookie: { maxAge: 86400000, secure: true }
+    })
 );
 
 app.use((req, res, next) => {

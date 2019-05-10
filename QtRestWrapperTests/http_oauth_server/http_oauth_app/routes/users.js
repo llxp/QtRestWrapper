@@ -1,54 +1,54 @@
 var express = require('express');
 var router = express.Router();
+const url = require('url'); // built-in utility
 
-const https = require('https');
+const upgradeToken = require('./upgradeToken');
+const verifyToken = require('./verifyToken');
 
-const client_secret = "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL";
+const renderPage = function(res) {
+	res.send('<html><body><h1>protected content</h1></body></html>');
+};
+
+const renderErrorPage = function(res) {
+	res.send('<html><body><h1>Error upgrading the token!</h1></body></html>');
+};
+
+const redirectToSsoLogin = function(res, fullUrl) {
+	res.redirect("https://localhost:3001/simplesso/login?serviceURL=" + fullUrl);
+};
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	console.log("query: " + req.query);
-	console.log(req.query);
 	const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-	console.log(req.session.authToken);
-	if(typeof(req.session.authToken) == typeof(undefined) && typeof(req.query.ssoToken) == typeof(undefined)) {
-		console.log("redirecting to login page");
-		res.redirect("https://localhost:3001/simplesso/login?serviceURL=" + fullUrl);
-	} else if(typeof(req.session.authToken) != typeof(undefined)) {
-		res.send('<html><body><h1>protected content</h1></body></html>');
-	} else if(typeof(req.query.ssoToken) != typeof(undefined) && req.query.ssoToken != null) {
-		req.session.ssoToken = req.query.ssoToken;
-		//res.send('protected content');
+	if(typeof(req.session.authToken) !== typeof(undefined)) {
 		// verify the token
-		console.log("verify the token");
-		process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-		var options = {        
-			hostname: 'localhost',
-			port: 3001,
-			path: '/simplesso/upgradetoken?ssoToken=' + req.session.ssoToken + '&client_secret='+ client_secret,
-			method: 'GET',
-			/*headers:{
-				Authorization: ' Bearer ' + client_secret
-			}*/
-		};
-		https.get(options, (resp) => {
-			console.log("token verification started...");
-			console.log(resp.statusCode);
-			if(resp.statusCode == 200) {
-				var data = "";
-				resp.on('data', (chunk) => {
-					data += chunk;
-				});
-				resp.on('end', () => {
-					req.session.authToken = data.token;
-					res.send('<html><body><h1>protected content</h1></body></html>');
-				});
-			} else {
-				res.redirect("https://localhost:3001/simplesso/login?serviceURL=" + fullUrl);
-			}
-		}).on('error', (err) => {
-			console.log("Error: " + err.message);
+		verifyToken(req.protocol + '://' + req.get('host'), req.session.authToken, () => {
+			renderPage(res);
+		}, () => {
+			delete req.session.authToken;
+			redirectToSsoLogin(res, fullUrl);
 		});
+	} else if(typeof(req.query.ssoToken) !== typeof(undefined)) {
+		// upgrade the token
+		upgradeToken(req.protocol + '://' + req.get('host'), req.query.ssoToken, (bearerToken) => {
+			req.session.authToken = bearerToken;
+			//renderPage(res);
+			const parsedUrl = url.parse(fullUrl);
+			console.log('redirect to users page without the query: '  + 'https://localhost:3000/protectedContent');
+			//delete req.query;
+			//res.redirect('https://localhost:3000/users');
+			//res.redirect(302, 'https://localhost:3000/protectedContent');
+			//req.query = {};
+			//delete req.query;
+			//delete req;
+			res.redirect(req.protocol + '://' + parsedUrl.host + parsedUrl.pathname);
+		}, () => {
+			console.log("failed to upgrade the token");
+			renderErrorPage(res);
+		});
+	} else {
+		console.log('redirect to sso server login');
+		redirectToSsoLogin(res, fullUrl);
 	}
 });
 

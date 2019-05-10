@@ -8,7 +8,6 @@ const genJwtToken = payload =>
     // some of the libraries and libraries written in other language,
     // expect base64 encoded secrets, so sign using the base64 to make
     // jwt useable across all platform and langauage.
-    console.log(privateCert);
     jwt.sign(payload, privateCert.privateCert, {
         algorithm: "RS256",
         expiresIn: "1h",

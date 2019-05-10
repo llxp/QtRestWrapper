@@ -3,35 +3,45 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cookieSession = require('cookie-session');
+//var cookieSession = require('cookie-session');
+var session = require('express-session');
+var MemoryStore = require('memorystore')(session);
+var cors = require('express-cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var protectedContentRouter = require('./routes/protectedContent');
+var unprotectedContentRouter = require('./routes/unprotectedContent');
+var testRestFunctionRouter = require('./routes/testRestFunction');
+var protectedRestFunctionRouter = require('./routes/protectedRestFunction');
 
 var app = express();
 
-/*app.use(
-  session({
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-    name: "session",
-    secure: false
-  })
-);*/
+const corsOptions = {
+  origin: 'https://localhost:3000', //the port my react app is running on.
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(
-  cookieSession({
-    /*secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-    name: "session",
-    secure: true*/
+  /*cookieSession({
     name: 'session2',
-    keys: [/* secret keys */"keyboard cat2"],
+    keys: ["keyboard cat2"],
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  })
+  })*/
+	session({
+		store: new MemoryStore({
+			checkPeriod: 86400000
+		}),
+		secret: "keyboard cat3",
+    	resave: true,
+    	saveUninitialized: true,
+    	name: "session3",
+    	//secure: false,
+    	cookie: { maxAge: 86400000, secure: true }
+	})
 );
 
 app.use((req, res, next) => {
@@ -53,7 +63,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+//app.use('/users', usersRouter);
+app.use('/protectedContent', usersRouter);
+app.use('/unprotectedContent', unprotectedContentRouter);
+app.use('/unprotectedRestFunction', testRestFunctionRouter);
+app.use('/protectedRestFunction', protectedRestFunctionRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
