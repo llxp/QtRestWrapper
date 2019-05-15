@@ -49,7 +49,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 certAuthServer.listen(port2);
-certAuthServer.on('error', onError);
+certAuthServer.on('error', onError2);
 certAuthServer.on('listening', onListening2);
 
 /**
@@ -100,6 +100,30 @@ function onError(error) {
   }
 }
 
+function onError2(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port2 === 'string'
+    ? 'Pipe ' + port2
+    : 'Port ' + port2;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
 /**
  * Event listener for HTTP server "listening" event.
  */
@@ -117,5 +141,5 @@ function onListening2() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  debug2('Listening on ' + bind);
 }

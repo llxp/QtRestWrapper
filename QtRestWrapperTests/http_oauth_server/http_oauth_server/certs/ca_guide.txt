@@ -1,0 +1,42 @@
+Guide from: https://github.com/anders94/https-authorized-clients
+
+// create the ca key and cert
+openssl req -new -x509 -days 9999 -config ./ca.cnf -keyout ./ca-key.pem -out ./ca-crt.pem
+
+// generate the keys for server, client1 and client2
+openssl genrsa -out ./server-key.pem 4096
+openssl genrsa -out ./client1-key.pem 4096
+openssl genrsa -out ./client2-key.pem 4096
+
+// sign the certificates using the created ca
+// sign the server certificate
+openssl req -new -config ./server.cnf -key ./server-key.pem -out ./server-csr.pem
+openssl x509 -req -extfile ./server.cnf -days 999 -passin "pass:password" -in ./server-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./server-crt.pem
+
+// sign the client1 certificate
+openssl req -new -config ./client1.cnf -key ./client1-key.pem -out ./client1-csr.pem
+openssl x509 -req -extfile ./client1.cnf -days 999 -passin "pass:password" -in ./client1-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./client1-crt.pem
+
+// sign the client2 certificate
+openssl req -new -config ./client2.cnf -key ./client2-key.pem -out ./client2-csr.pem
+openssl x509 -req -extfile ./client2.cnf -days 999 -passin "pass:password" -in ./client2-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./client2-crt.pem
+
+// verify the certificates
+openssl verify -CAfile ./ca-crt.pem ./server-crt.pem
+openssl verify -CAfile ./ca-crt.pem ./client1-crt.pem
+openssl verify -CAfile ./ca-crt.pem ./client2-crt.pem
+
+// bundle client certificates to pfx to import them to windows cert store
+openssl pkcs12 -inkey ./client1-key.pem -in ./client1-crt.pem -export -out ./client1-crt.pfx
+openssl pkcs12 -inkey ./client2-key.pem -in ./client2-crt.pem -export -out ./client2-crt.pfx
+
+
+
+
+req -new -config ./server.cnf -key ./server-key.pem -out ./server-csr.pem
+req -new -config ./server.cnf -key ./server-key.pem -out ./server-csr.pem
+
+x509 -req -extfile ./server.cnf -days 9999 -passin "pass:password" -in ./server-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./ca-crt.pem
+x509 -req -extfile ./server.cnf -days 9999 -passin "pass:password" -in ./server-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./server-crt.pem
+
+x509 -req -extfile ./server.cnf -days 9999 -passin "pass:password" -in ./server-csr.pem -CA ./ca-crt.pem -CAkey ./ca-key.pem -CAcreateserial -out ./ca-crt.pem

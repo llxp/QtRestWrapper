@@ -6,10 +6,13 @@ var logger = require('morgan');
 const session = require("express-session");
 var cookieSession = require('cookie-session');
 var MemoryStore = require('memorystore')(session);
+var cors = require('cors');
 
 var router = require('./router');
 
 var app = express();
+
+app.use(cors());
 
 /*app.use(
   cookieSession({
@@ -37,11 +40,14 @@ app.use(
       checkPeriod: 86400000
     }),
     secret: "keyboard cat1",
-      resave: true,
-      saveUninitialized: true,
-      name: "session1",
-      //secure: false,
-      cookie: { maxAge: 86400000, secure: true }
+    resave: true,
+    saveUninitialized: true,
+    name: "session1",
+    //secure: false,
+    cookie: {
+      maxAge: 86400000,
+      secure: true
+    }
   })
 );
 

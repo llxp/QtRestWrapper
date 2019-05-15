@@ -8,14 +8,13 @@ var session = require('express-session');
 var MemoryStore = require('memorystore')(session);
 var cors = require('express-cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var app = express();
+
+var protectedContent = require('./routes/protectedContent');
 var protectedContentRouter = require('./routes/protectedContent');
 var unprotectedContentRouter = require('./routes/unprotectedContent');
 var testRestFunctionRouter = require('./routes/testRestFunction');
 var protectedRestFunctionRouter = require('./routes/protectedRestFunction');
-
-var app = express();
 
 const corsOptions = {
   origin: 'https://localhost:3000', //the port my react app is running on.
@@ -62,12 +61,45 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 //app.use('/users', usersRouter);
-app.use('/protectedContent', usersRouter);
+app.use('/protectedContent', protectedContent);
 app.use('/unprotectedContent', unprotectedContentRouter);
 app.use('/unprotectedRestFunction', testRestFunctionRouter);
 app.use('/protectedRestFunction', protectedRestFunctionRouter);
+var routesArray = [];
+app._router.stack.forEach(print.bind(null, []));
+var indexRouter = require('./routes/index')(routesArray);
+app.use('/', indexRouter);
+
+function print (path, layer) {
+  if (layer.route) {
+    layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))))
+  } else if (layer.name === 'router' && layer.handle.stack) {
+    layer.handle.stack.forEach(print.bind(null, path.concat(split(layer.regexp))))
+  } else if (layer.method) {
+    /*console.log('/%s',
+      //layer.method.toUpperCase(),
+      path.concat(split(layer.regexp)).filter(Boolean).join('/'))*/
+      var route = path.concat(split(layer.regexp)).filter(Boolean).join('/');
+      routesArray.push('/' + route);
+  }
+}
+
+function split (thing) {
+  if (typeof thing === 'string') {
+    return thing.split('/')
+  } else if (thing.fast_slash) {
+    return ''
+  } else {
+    var match = thing.toString()
+      .replace('\\/?', '')
+      .replace('(?=\\/|$)', '$')
+      .match(/^\/\^((?:\\[.*+?^${}()|[\]\\\/]|[^.*+?^${}()|[\]\\\/])*)\$\//)
+    return match
+      ? match[1].replace(/\\(.)/g, '$1').split('/')
+      : '<complex:' + thing.toString() + '>'
+  }
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

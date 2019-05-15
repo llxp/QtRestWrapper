@@ -12,7 +12,7 @@ ST                     = MA
 L                      = Boston
 O                      = Example Co
 OU                     = techops
-CN                     = client1
+CN                     = client2
 emailAddress           = certs@example.com
 
 [ req_attributes ]

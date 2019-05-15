@@ -6,10 +6,13 @@ var logger = require('morgan');
 const session = require("express-session");
 var cookieSession = require('cookie-session');
 var MemoryStore = require('memorystore')(session);
+var cors = require('cors');
 
 const doCertLogin = require("./controller/doCertLogin");
 
 var app = express();
+
+app.use(cors());
 
 /*app.use(
   cookieSession({
@@ -32,17 +35,20 @@ app.use(
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   })*/
-    session({
-        store: new MemoryStore({
-            checkPeriod: 86400000
-        }),
-        secret: "keyboard cat1",
-        resave: true,
-        saveUninitialized: true,
-        name: "session1",
-        //secure: false,
-        cookie: { maxAge: 86400000, secure: true }
-    })
+  session({
+    store: new MemoryStore({
+      checkPeriod: 86400000
+    }),
+    secret: "keyboard cat1",
+    resave: true,
+    saveUninitialized: true,
+    name: "session1",
+    //secure: false,
+    cookie: {
+        maxAge: 86400000,
+        secure: true
+    }
+  })
 );
 
 app.use((req, res, next) => {
