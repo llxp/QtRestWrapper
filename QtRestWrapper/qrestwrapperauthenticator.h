@@ -1,0 +1,91 @@
+#ifndef QRESTWRAPPERURLCHECKER_H
+#define QRESTWRAPPERURLCHECKER_H
+
+#include "qrestwrappercookiejar.h"
+#include "qrestwrapperurlinterceptor.h"
+
+#include <QNetworkReply>
+#include <QObject>
+#include <QWebEngineCookieStore>
+#include <QWebEngineView>
+
+namespace QtRestWrapper {
+class QTRESTWRAPPERSHARED_EXPORT QRestWrapperAuthenticator : public QObject
+{
+    Q_OBJECT
+public:
+    explicit QRestWrapperAuthenticator(QObject *parent = nullptr);
+
+public slots:
+    void authenticate();
+
+public:
+    void setStoragePath(const QString &path);  // default will be the applications path, path needs to end without '/'
+    void setAuthenticationTestUrl(const QUrl &url);
+    void setApplicationUrl(const QUrl &url);
+    void setAlternateAuthenticationCheck(bool alternateAuthenticationCheck);
+
+public slots:
+    void deleteCookiesByName(const QString &cookieName);
+    void deleteCookiesByDomain(const QString &cookieDomain);
+    void deleteCookiesByPath(const QString &cookiePath);
+    void deleteCookiesByNameAndDomain(const QString &cookieName, const QString &cookieDomain);
+    void deleteCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath);
+    void clearAllCookies();
+
+public slots:
+    QVector<QNetworkCookie> getCookiesByName(const QString &cookieName) const;
+    QVector<QNetworkCookie> getCookiesByDomain(const QString &cookieDomain) const;
+    QVector<QNetworkCookie> getCookiesByPath(const QString &cookiePath) const;
+    QVector<QNetworkCookie> getCookiesByNameAndDomain(const QString &cookieName, const QString &cookieDomain) const;
+    QVector<QNetworkCookie> getCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
+    QVector<QNetworkCookie> getAllCookies() const;
+
+public slots:
+    QVector<QString> getOriginalCookieStringsByName(const QString &cookieName) const;
+    QVector<QString> getOriginalCookieStringsByDomain(const QString &cookieDomain) const;
+    QVector<QString> getOriginalCookieStringsByPath(const QString &cookiePath) const;
+    QVector<QString> getOriginalCookieStringsByNameAndDomain(const QString &cookieName, const QString &cookieDomain) const;
+    QVector<QString> getOriginalCookieStringsByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
+    QVector<QString> getAllCookieStrings() const;
+
+signals:
+    // will be called during authentication phase
+    // when a webengineview has been created, it can be attached to a widget using this signal
+    // if not connected a new window with the webengineview will be shown
+    void addWebView(QWebEngineView *view);
+    // will be called when the authentication phase is over
+    // when the webview should be detached from a widget, this signal has to be connected
+    // if not connected, the shown webengineview will closed
+    void removeWebView(QWebEngineView *view);
+    // will be called, when the authenticated reached the point of a valid authenticated
+    void authenticated(const QUrl &url);
+    // will be called (if connected) if a custom authenticated check is needed
+    // return true, if the authentication check was successful
+    // otherwise, the authentication phase will just continue
+    bool authenticationCheck(const QUrl &url);
+
+private slots:
+    void checkUrlForAuthentication(const QUrl &url);
+    void initWebEngineView();
+    void initClientCertificateSelection();
+
+protected:
+    QVector<QString> m_allowedUrlPatterns;
+    QVector<QString> m_forbiddenUrlPatterns;
+
+private:
+    QRestWrapperCookieJar m_cookieJar;
+    QScopedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
+    QScopedPointer<QWebEngineView> m_view;
+    QWebEnginePage *m_page;
+    QWebEngineCookieStore *m_cookieStore;
+    QUrl m_authenticationTestUrl;
+    QUrl m_applicationUrl;
+    bool m_isAuthenticated { false };
+    QString m_storagePath;
+    bool m_alternateAuthenticationCheck;
+};
+}  // namespace QtRestWrapper
+
+#endif // QRESTWRAPPERURLCHECKER_H

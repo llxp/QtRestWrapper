@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "../QtRestWrapper/qrestwrapper.h"
+#include "../QtRestWrapper/qrestwrapperauthenticator.h"
 
 namespace QtRestWrapper {
 
@@ -23,8 +23,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QtRestWrapper::QRestWrapper *m_restWrapperInstance;
-    QRestWrapperPrivate *m_restWrapperPrivateInstance;
+    QtRestWrapper::QRestWrapperAuthenticator *m_restWrapperAuthenticatorInstance;
     QtRestWrapper::QRestWrapperUrlInterceptor *m_requestInterceptor;
 };
 

@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QNetworkReply>
 #include <QVector>
+#include <QMetaMethod>
 
 class QWebEngineView;
 class QWebEngineClientCertificateSelection;
@@ -33,7 +34,7 @@ class QTRESTWRAPPERSHARED_EXPORT QRestWrapper : public QObject
     Q_DECLARE_PRIVATE(QRestWrapper)
 public:
     explicit QRestWrapper(QObject *parent = nullptr);
-    ~QRestWrapper();
+    virtual ~QRestWrapper() override;
 
 public:
     void setStoragePath(const QString &path);  // default will be the applications path, path needs to end without '/'
@@ -62,7 +63,7 @@ public:
     void deleteCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath);
     void clearAllCookies();
 
-public:
+public:  // methods to get cookies by identifiers
     QVector<QNetworkCookie> getCookiesByName(const QString &cookieName) const;
     QVector<QNetworkCookie> getCookiesByDomain(const QString &cookieDomain) const;
     QVector<QNetworkCookie> getCookiesByPath(const QString &cookiePath) const;
@@ -70,7 +71,7 @@ public:
     QVector<QNetworkCookie> getCookiesByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
     QVector<QNetworkCookie> getAllCookies() const;
 
-public:
+public:  // methods to get the raw cookie strings by identifiers
     QVector<QString> getOriginalCookieStringsByName(const QString &cookieName) const;
     QVector<QString> getOriginalCookieStringsByDomain(const QString &cookieDomain) const;
     QVector<QString> getOriginalCookieStringsByPath(const QString &cookiePath) const;
@@ -78,11 +79,11 @@ public:
     QVector<QString> getOriginalCookieStringsByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
     QVector<QString> getAllCookieStrings() const;
 
-public:
+public:  // static utilities
     // generates a unique random string, unique only, when only this function will be used to generate the random string
     static QString randomString(int length = 12);
     // utility function to split a cookie string into individual raw cookies
-    static std::map<QString, QString> cookieSplit(const QString &cookieString);
+    static QMap<QString, QString> cookieSplit(const QString &cookieString);
 
 signals:
     // will be called during authentication phase
@@ -104,13 +105,13 @@ signals:
     // these signals will be called, once there has been a reply from a rest request
     // check for the url, to see, if the signal matches the right request
     void contentReady(const QUrl &url, const QByteArray &content); // status 200
-    void authenticationFailure(const QUrl &url, const QByteArray &content); // status 40*
+    void authenticationFailure(const QUrl &url, const QByteArray &content, int statusCode); // status 40*
     void notFound(const QUrl &url, const QByteArray &content); // status 404
-    void undefinedStatusCode(const QUrl &url, const QByteArray &content); // every other status code
+    void undefinedStatusCode(const QUrl &url, const QByteArray &content, int statusCode); // every other status code
 
-private slots:
-    void checkUrlForAuthentication(const QUrl &url);
-    void waitForCustomRequest(QNetworkReply *reply);
+protected:
+    virtual void connectNotify(const QMetaMethod &signal) override;
+    virtual void disconnectNotify(const QMetaMethod &signal) override;
 
 private:
     QScopedPointer<QRestWrapperPrivate> const d_ptr;

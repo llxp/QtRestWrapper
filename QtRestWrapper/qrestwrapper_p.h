@@ -4,6 +4,8 @@
 #include "qrestwrappercookiejar.h"
 #include "qrestwrapperurlinterceptor.h"
 #include "qrestwrapper.h"
+#include "qrestwrapperauthenticator.h"
+#include "qrestwrappernetworkhandler.h"
 
 #include <QMap>
 #include <QNetworkCookie>
@@ -72,39 +74,15 @@ public:
     // generates a unique random string, unique only, when only this function will be used to generate the random string
     static QString randomString(int length = 12);
     // utility function to split a cookie string into individual raw cookies
-    static std::map<QString, QString> cookieSplit(const QString &cookieString);
-
-private slots:
-    void checkUrlForAuthentication(const QUrl &url);
-    void waitForCustomRequest(QNetworkReply *reply);
-
-private:
-    void initWebEngineView();
-    void initClientCertificateSelection();
-    void cleanupRequest(const QString &registeredString);
-
-private:
-    QNetworkAccessManager m_networkAccessManager;
-    QMap<QString, QPair<QString, QSharedPointer<QByteArray>>> m_registeredPayloadData;
-    QMap<QString, QMap<QString, QString>> m_registeredCustomHeaders;
-
-private:
-    QRestWrapperCookieJar m_cookieJar;
-    QSharedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
-    QWebEngineView *m_view;
-    QWebEnginePage *m_page;
-    QWebEngineCookieStore *m_cookieStore { nullptr };
-    QUrl m_authenticationTestUrl { "" };
-    QUrl m_applicationUrl {""};
-    bool m_isAuthenticated { false };
-    QString m_storagePath;
+    static QMap<QString, QString> cookieSplit(const QString &cookieString);
 
 protected:
-    QVector<QString> m_allowedUrlPatterns;
-    QVector<QString> m_forbiddenUrlPatterns;
+    void connectNotify(const QMetaMethod &signal);
+    void disconnectNotify(const QMetaMethod &signal);
 
 private:
-    static QVector<QString> m_generatedRandomStrings;
+    QRestWrapperAuthenticator m_authenticator;
+    QRestWrapperNetworkHandler m_networkHandler;
 
 private:
     QRestWrapper *q_ptr;

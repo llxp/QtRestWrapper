@@ -22,22 +22,15 @@ QRestWrapperUrlInterceptorTest::QRestWrapperUrlInterceptorTest(QObject *parent) 
 
 void QRestWrapperUrlInterceptorTest::initTestCase()
 {
-    m_requestInterceptor = new QRestWrapperUrlInterceptor();
+    m_restWrapperAuthenticatorInstance = new QRestWrapperAuthenticator();
+    QVERIFY(m_restWrapperAuthenticatorInstance != nullptr);
+    m_requestInterceptor = new QRestWrapperUrlInterceptor(m_restWrapperAuthenticatorInstance);
     QVERIFY(m_requestInterceptor != nullptr);
-    m_restWrapperInstance = new QRestWrapper();
-    QVERIFY(m_restWrapperInstance != nullptr);
-    if(QMetaObject::invokeMethod(m_restWrapperInstance, "d_ptrFunc", Qt::DirectConnection, Q_RETURN_ARG(QRestWrapperPrivate *, m_restWrapperPrivateInstance))) {
-        QVERIFY(true);
-    } else {
-        QVERIFY(false);
-    }
-    QVERIFY(m_restWrapperPrivateInstance != nullptr);
 }
 
 void QRestWrapperUrlInterceptorTest::setRestWrapper_case()
 {
-    m_requestInterceptor->setRestWrapper(m_restWrapperPrivateInstance);
-    QVERIFY(m_requestInterceptor->m_restWrapper == m_restWrapperPrivateInstance);
+    QVERIFY(m_requestInterceptor->m_restWrapperAuthenticator == m_restWrapperAuthenticatorInstance);
 }
 
 void QRestWrapperUrlInterceptorTest::checkForAllowedList_case()

@@ -7,7 +7,7 @@
 
 namespace QtRestWrapper {
 
-class QRestWrapperPrivate;
+class QRestWrapperAuthenticator;
 class QRestWrapperUrlInterceptorTest;
 
 class QTRESTWRAPPERSHARED_EXPORT QRestWrapperUrlInterceptor : public QWebEngineUrlRequestInterceptor
@@ -15,8 +15,8 @@ class QTRESTWRAPPERSHARED_EXPORT QRestWrapperUrlInterceptor : public QWebEngineU
     Q_OBJECT
     Q_DISABLE_COPY(QRestWrapperUrlInterceptor)
 public:
-    QRestWrapperUrlInterceptor(QObject *parent = nullptr);
-    void setRestWrapper(QRestWrapperPrivate *restWrapper);
+    QRestWrapperUrlInterceptor(QRestWrapperAuthenticator *restWrapper, QObject *parent = nullptr);
+    void setRestWrapperAuthenticator(QRestWrapperAuthenticator *restWrapper);
     void interceptRequest(QWebEngineUrlRequestInfo &info);
 
 signals:
@@ -27,7 +27,7 @@ private:
     bool checkForForbiddenList(const QVector<QString> &forbiddenList, const QUrl &url) const;
 
 private:
-    QRestWrapperPrivate *m_restWrapper;
+    QRestWrapperAuthenticator *m_restWrapperAuthenticator;
 
 private:
     friend class QRestWrapperUrlInterceptorTest;

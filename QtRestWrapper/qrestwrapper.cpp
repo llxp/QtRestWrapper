@@ -1,6 +1,6 @@
 #include "qrestwrapper.h"
-#include "qrestwrapperurlinterceptor.h"
 #include "qrestwrapper_p.h"
+#include "qrestwrapperauthenticator.h"
 
 #include <QWebEngineUrlRequestInfo>
 #include <QWebEngineUrlRequestInterceptor>
@@ -232,19 +232,19 @@ QString QRestWrapper::randomString(int length)
     return QRestWrapperPrivate::randomString(length);
 }
 
-std::map<QString, QString> QRestWrapper::cookieSplit(const QString &cookieString)
+QMap<QString, QString> QRestWrapper::cookieSplit(const QString &cookieString)
 {
     return QRestWrapperPrivate::cookieSplit(cookieString);
 }
 
-void QRestWrapper::checkUrlForAuthentication(const QUrl &url)
+void QtRestWrapper::QRestWrapper::connectNotify(const QMetaMethod &signal)
 {
     Q_D(QRestWrapper);
-    d->checkUrlForAuthentication(url);
+    d->connectNotify(signal);
 }
 
-void QRestWrapper::waitForCustomRequest(QNetworkReply *reply)
+void QRestWrapper::disconnectNotify(const QMetaMethod &signal)
 {
     Q_D(QRestWrapper);
-    d->waitForCustomRequest(reply);
+    d->disconnectNotify(signal);
 }

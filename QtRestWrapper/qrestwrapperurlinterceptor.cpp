@@ -1,6 +1,6 @@
 #include "qrestwrapperurlinterceptor.h"
 #include "qrestwrapper.h"
-#include "qrestwrapper_p.h"
+#include "qrestwrapperauthenticator.h"
 
 #include <QRegularExpression>
 #include <QWebEngineUrlRequestInterceptor>
@@ -8,7 +8,7 @@
 namespace QtRestWrapper {
 
 // temp class to get access to the filter lists stored in the QRestWrapper class
-class QRestWrapperTemp : public QRestWrapperPrivate {
+class QRestWrapperAuthenticatorTemp : public QRestWrapperAuthenticator {
 public:
     QVector<QString> getAllowedUrlPatterns() const {
         return m_allowedUrlPatterns;
@@ -18,15 +18,9 @@ public:
     }
 };
 
-QRestWrapperUrlInterceptor::QRestWrapperUrlInterceptor(QObject *parent) : QWebEngineUrlRequestInterceptor(parent)
+QRestWrapperUrlInterceptor::QRestWrapperUrlInterceptor(QRestWrapperAuthenticator *restWrapper, QObject *parent) : QWebEngineUrlRequestInterceptor(parent), m_restWrapperAuthenticator(restWrapper)
 {
 
-}
-
-// testable
-void QRestWrapperUrlInterceptor::setRestWrapper(QRestWrapperPrivate *restWrapper)
-{
-    m_restWrapper = restWrapper;
 }
 
 // not testable, because QWebEngineUrlRequestInfo is not instantiable
@@ -35,7 +29,7 @@ void QRestWrapperUrlInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info
     bool shouldBeAllowed = false;
 
     // cast to the temp class to get access to the filter lists
-    QRestWrapperTemp *ptr = static_cast<QRestWrapperTemp *>(m_restWrapper);
+    QRestWrapperAuthenticatorTemp *ptr = static_cast<QRestWrapperAuthenticatorTemp *>(m_restWrapperAuthenticator);
 
     shouldBeAllowed = checkForAllowedList(ptr->getAllowedUrlPatterns(), info.requestUrl());
     shouldBeAllowed = checkForForbiddenList(ptr->getForbiddenUrlPatterns(), info.requestUrl());
