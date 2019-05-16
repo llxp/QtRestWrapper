@@ -2,6 +2,7 @@
 #define TST_QRESTWRAOOER_H
 
 #include <QObject>
+#include "../QtRestWrapper/qrestwrapper.h"
 
 namespace QtRestWrapper {
 
@@ -15,7 +16,13 @@ public:
     ~QRestWrapperTest();
 
 private slots:
+    void initTestCase();
     void test_case1();
+    void cleanupTestCase();
+
+private:
+    QRestWrapper *m_restWrapperInstance;
+    QRestWrapperPrivate *m_restWrapperPrivateInstance;
 };
 
 }  // namespace QtRestWrapper

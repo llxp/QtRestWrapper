@@ -23,7 +23,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QtRestWrapper::QRestWrapper m_restWrapperInstance;
+    QtRestWrapper::QRestWrapper *m_restWrapperInstance;
+    QRestWrapperPrivate *m_restWrapperPrivateInstance;
     QtRestWrapper::QRestWrapperUrlInterceptor *m_requestInterceptor;
 };
 

@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         qrestwrapper.cpp \
+        qrestwrapper_p.cpp \
         qrestwrappercookiejar.cpp \
         qrestwrapperurlinterceptor.cpp
 
 HEADERS += \
         qrestwrapper.h \
+        qrestwrapper_p.h \
         qrestwrappercookiejar.h \
         qrestwrapperurlinterceptor.h \
         qtrestwrapper_global.h

@@ -25,9 +25,12 @@ namespace QtRestWrapper {
 class QRestWrapperUrlInterceptor;
 class QRestWrapperTest;
 
+class QRestWrapperPrivate;
+
 class QTRESTWRAPPERSHARED_EXPORT QRestWrapper : public QObject
 {
     Q_OBJECT
+    Q_DECLARE_PRIVATE(QRestWrapper)
 public:
     explicit QRestWrapper(QObject *parent = nullptr);
     ~QRestWrapper();
@@ -48,7 +51,7 @@ public:
     void sendOptionsRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
     void sendPostRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
     void sendPostRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
-    void sendJsonPostRequest(const QUrl &url, const QJsonDocument &json, const QString &verb, const QMap<QString, QString> &header = QMap<QString, QString>());
+    void sendJsonRequest(const QUrl &url, const QJsonDocument &json, const QString &verb, const QMap<QString, QString> &header = QMap<QString, QString>());
     void sendRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &verb, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
 
 public:
@@ -110,35 +113,10 @@ private slots:
     void waitForCustomRequest(QNetworkReply *reply);
 
 private:
-    void initWebEngineView();
-    void initClientCertificateSelection();
-    void cleanupRequest(const QString &registeredString);
+    QScopedPointer<QRestWrapperPrivate> const d_ptr;
 
-private:
-    QNetworkAccessManager m_networkAccessManager;
-    QMap<QString, QPair<QString, QSharedPointer<QByteArray>>> m_registeredPayloadData;
-    QMap<QString, QMap<QString, QString>> m_registeredCustomHeaders;
-
-private:
-    QRestWrapperCookieJar m_cookieJar;
-    QSharedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
-    QWebEngineView *m_view;
-    QWebEnginePage *m_page;
-    QWebEngineCookieStore *m_cookieStore { nullptr };
-    QUrl m_authenticationTestUrl { "" };
-    QUrl m_applicationUrl {""};
-    bool m_isAuthenticated { false };
-    QString m_storagePath;
-
-protected:
-    QVector<QString> m_allowedUrlPatterns;
-    QVector<QString> m_forbiddenUrlPatterns;
-
-private:
-    static QVector<QString> m_generatedRandomStrings;
-
-private:
-    friend class QRestWrapperTest;
+private slots:
+    QRestWrapperPrivate *d_ptrFunc() { Q_D(QRestWrapper); return d; }
 };
 
 }  // namespace QtRestWrapper
