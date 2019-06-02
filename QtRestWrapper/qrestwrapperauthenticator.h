@@ -1,7 +1,9 @@
 #ifndef QRESTWRAPPERURLCHECKER_H
 #define QRESTWRAPPERURLCHECKER_H
 
+#include "qrestwrappercertificateerror.h"
 #include "qrestwrappercookiejar.h"
+#include "qrestwrapperpage.h"
 #include "qrestwrapperurlinterceptor.h"
 
 #include <QNetworkReply>
@@ -15,6 +17,7 @@ class QTRESTWRAPPERSHARED_EXPORT QRestWrapperAuthenticator : public QObject
     Q_OBJECT
 public:
     explicit QRestWrapperAuthenticator(QObject *parent = nullptr);
+    ~QRestWrapperAuthenticator();
 
 public slots:
     void authenticate();
@@ -24,6 +27,8 @@ public:
     void setAuthenticationTestUrl(const QUrl &url);
     void setApplicationUrl(const QUrl &url);
     void setAlternateAuthenticationCheck(bool alternateAuthenticationCheck);
+    void setFetchContentOnAuthenticated(bool fetchContentOnAuthenticated);
+    void setFetchContentOnAuthenticationCheck(bool fetchContentOnAuthenticationCheck);
 
 public slots:
     void deleteCookiesByName(const QString &cookieName);
@@ -53,38 +58,48 @@ signals:
     // will be called during authentication phase
     // when a webengineview has been created, it can be attached to a widget using this signal
     // if not connected a new window with the webengineview will be shown
-    void addWebView(QWebEngineView *view);
+    void addWebView(QWidget *view);
     // will be called when the authentication phase is over
     // when the webview should be detached from a widget, this signal has to be connected
     // if not connected, the shown webengineview will closed
-    void removeWebView(QWebEngineView *view);
+    void removeWebView(QWidget *view);
     // will be called, when the authenticated reached the point of a valid authenticated
     void authenticated(const QUrl &url);
+    void authenticatedContent(const QUrl &url, const QByteArray &content);
     // will be called (if connected) if a custom authenticated check is needed
     // return true, if the authentication check was successful
     // otherwise, the authentication phase will just continue
     bool authenticationCheck(const QUrl &url);
+    bool authenticationCheckContent(const QUrl &url, const QByteArray &content);
+    // will be called, if there is a ssl certificate error
+    // return true to ignore the certificate error, return false to cancel the connection
+    bool certificateError(const QRestWrapperCertificateError &error);
 
 private slots:
     void checkUrlForAuthentication(const QUrl &url);
+    void checkUrlForCustomAuthentication(const QUrl &url);
+    void checkUrlForImplementedAuthentication(const QUrl &url);
+    void urlCheckFinished(const QUrl &url);
     void initWebEngineView();
-    void initClientCertificateSelection();
+    void clientCertificateNeeded(QWebEngineClientCertificateSelection clientCertificateSelection);
 
 protected:
     QVector<QString> m_allowedUrlPatterns;
     QVector<QString> m_forbiddenUrlPatterns;
 
-private:
-    QRestWrapperCookieJar m_cookieJar;
-    QScopedPointer<QRestWrapperUrlInterceptor> m_urlInterceptor;
-    QScopedPointer<QWebEngineView> m_view;
-    QWebEnginePage *m_page;
+protected:
+    QRestWrapperCookieJar *m_cookieJar;
+    QRestWrapperUrlInterceptor *m_urlInterceptor;
+    QWebEngineView *m_view;
+    QRestWrapperPage *m_page;
     QWebEngineCookieStore *m_cookieStore;
     QUrl m_authenticationTestUrl;
     QUrl m_applicationUrl;
-    bool m_isAuthenticated { false };
+    bool m_isAuthenticated;
     QString m_storagePath;
     bool m_alternateAuthenticationCheck;
+    bool m_fetchContentOnAuthenticated;
+    bool m_fetchContentOnAuthenticationCheck;
 };
 }  // namespace QtRestWrapper
 

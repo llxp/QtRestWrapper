@@ -8,11 +8,34 @@ var cookieSession = require('cookie-session');
 var MemoryStore = require('memorystore')(session);
 var cors = require('cors');
 
+//const redis = require('redis');
+//const redisClient = redis.createClient();
+//const redisStore = require('connect-redis')(session);
+
 var router = require('./router');
 
 var app = express();
 
 app.use(cors());
+
+/*var store = new MongoDBStore({
+  uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
+  collection: 'session'
+});*/
+
+// Catch errors
+//store.on('error', function(error) {
+//  console.log(error);
+//});
+
+/*app.use(session({
+  secret: 'ThisIsHowYouUseRedisSessionStorage',
+  name: 'session',
+  resave: true,
+  saveUninitialized: true,
+  cookie: { secure: false }, // Note that the cookie-parser module is no longer needed
+  store: new redisStore({ host: 'localhost', port: 6379, client: redisClient, ttl: 86400 }),
+}));*/
 
 /*app.use(
   cookieSession({
@@ -29,12 +52,12 @@ app.use(cors());
 );*/
 
 app.use(
-  /*cookieSession({
-    name: 'session2',
-    keys: ["keyboard cat2"],
-    // Cookie Options
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  })*/
+  //cookieSession({
+  //  name: 'session2',
+  //  keys: ["keyboard cat2"],
+  //  // Cookie Options
+  //  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  //})
   session({
     store: new MemoryStore({
       checkPeriod: 86400000
@@ -50,6 +73,8 @@ app.use(
     }
   })
 );
+
+
 
 app.use((req, res, next) => {
   console.log(req.session);

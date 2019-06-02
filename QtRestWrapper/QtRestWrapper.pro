@@ -28,8 +28,10 @@ SOURCES += \
         qrestwrapper.cpp \
         qrestwrapper_p.cpp \
         qrestwrapperauthenticator.cpp \
+        qrestwrappercertificateerror.cpp \
         qrestwrappercookiejar.cpp \
         qrestwrappernetworkhandler.cpp \
+        qrestwrapperpage.cpp \
         qrestwrapperurlinterceptor.cpp \
         qrestwrapperutils.cpp
 
@@ -37,8 +39,10 @@ HEADERS += \
         qrestwrapper.h \
         qrestwrapper_p.h \
         qrestwrapperauthenticator.h \
+        qrestwrappercertificateerror.h \
         qrestwrappercookiejar.h \
         qrestwrappernetworkhandler.h \
+        qrestwrapperpage.h \
         qrestwrapperurlinterceptor.h \
         qrestwrapperutils.h \
         qtrestwrapper_global.h

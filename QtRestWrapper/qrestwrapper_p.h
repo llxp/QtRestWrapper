@@ -9,12 +9,10 @@
 
 #include <QMap>
 #include <QNetworkCookie>
-#include <QNetworkReply>
 #include <QSharedPointer>
 #include <QString>
 #include <QUrl>
-#include <QWebEngineCookieStore>
-#include <QWebEngineView>
+#include <QMetaMethod>
 
 
 
@@ -80,7 +78,7 @@ protected:
     void connectNotify(const QMetaMethod &signal);
     void disconnectNotify(const QMetaMethod &signal);
 
-private:
+protected:
     QRestWrapperAuthenticator m_authenticator;
     QRestWrapperNetworkHandler m_networkHandler;
 

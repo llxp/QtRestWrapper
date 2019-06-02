@@ -1,6 +1,7 @@
 #ifndef QTRESTWRAPPER_H
 #define QTRESTWRAPPER_H
 
+#include "qrestwrappercertificateerror.h"
 #include "qrestwrappercookiejar.h"
 #include "qtrestwrapper_global.h"
 
@@ -89,17 +90,22 @@ signals:
     // will be called during authentication phase
     // when a webengineview has been created, it can be attached to a widget using this signal
     // if not connected a new window with the webengineview will be shown
-    void addWebView(QWebEngineView *view);
+    void addWebView(QWidget *view);
     // will be called when the authentication phase is over
     // when the webview should be detached from a widget, this signal has to be connected
     // if not connected, the shown webengineview will closed
-    void removeWebView(QWebEngineView *view);
+    void removeWebView(QWidget *view);
     // will be called, when the authenticated reached the point of a valid authenticated
     void authenticated(const QUrl &url);
+    void authenticatedContent(const QUrl &url, const QByteArray &content);
     // will be called (if connected) if a custom authenticated check is needed
     // return true, if the authentication check was successful
     // otherwise, the authentication phase will just continue
     bool authenticationCheck(const QUrl &url);
+    bool authenticationCheckContent(const QUrl &url, const QByteArray &content);
+    // will be called, if there is a ssl certificate error
+    // return true to ignore the certificate error, return false to cancel the connection
+    bool certificateError(const QRestWrapperCertificateError &error);
 
 signals:
     // these signals will be called, once there has been a reply from a rest request

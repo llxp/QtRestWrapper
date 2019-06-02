@@ -2,16 +2,6 @@
 #include "qrestwrapper_p.h"
 #include "qrestwrapperutils.h"
 
-#include <QDialog>
-#include <QMetaMethod>
-#include <QPushButton>
-#include <QRegularExpression>
-#include <QTableWidget>
-#include <QVBoxLayout>
-#include <QWebEngineProfile>
-#include <QWebEngineSettings>
-#include <QApplication>
-
 namespace QtRestWrapper {
 
 QRestWrapperPrivate::QRestWrapperPrivate(QRestWrapper *q)
@@ -22,7 +12,10 @@ QRestWrapperPrivate::QRestWrapperPrivate(QRestWrapper *q)
     q->connect(&m_authenticator, &QRestWrapperAuthenticator::addWebView, q, &QRestWrapper::addWebView);
     q->connect(&m_authenticator, &QRestWrapperAuthenticator::removeWebView, q, &QRestWrapper::removeWebView);
     q->connect(&m_authenticator, &QRestWrapperAuthenticator::authenticated, q, &QRestWrapper::authenticated);
+    q->connect(&m_authenticator, &QRestWrapperAuthenticator::authenticatedContent, q, &QRestWrapper::authenticatedContent);
     q->connect(&m_authenticator, &QRestWrapperAuthenticator::authenticationCheck, q, &QRestWrapper::authenticationCheck);
+    q->connect(&m_authenticator, &QRestWrapperAuthenticator::authenticationCheckContent, q, &QRestWrapper::authenticationCheckContent);
+    q->connect(&m_authenticator, &QRestWrapperAuthenticator::certificateError, q, &QRestWrapper::certificateError);
 
     q->connect(&m_networkHandler, &QRestWrapperNetworkHandler::contentReady, q, &QRestWrapper::contentReady);
     q->connect(&m_networkHandler, &QRestWrapperNetworkHandler::authenticationFailure, q, &QRestWrapper::authenticationFailure);
@@ -226,6 +219,15 @@ void QRestWrapperPrivate::connectNotify(const QMetaMethod &signal)
         if(q->isSignalConnected(signal)) {
             m_authenticator.setAlternateAuthenticationCheck(true);
         }
+    } else if (signal == QMetaMethod::fromSignal(&QRestWrapper::authenticationCheckContent)) {
+        if(q->isSignalConnected(signal)) {
+            m_authenticator.setAlternateAuthenticationCheck(true);
+            m_authenticator.setFetchContentOnAuthenticationCheck(true);
+        }
+    } else if (signal == QMetaMethod::fromSignal(&QRestWrapper::authenticatedContent)) {
+        if(q->isSignalConnected(signal)) {
+            m_authenticator.setFetchContentOnAuthenticated(true);
+        }
     }
 }
 
@@ -233,8 +235,18 @@ void QRestWrapperPrivate::disconnectNotify(const QMetaMethod &signal)
 {
     Q_Q(QRestWrapper);
     if (signal == QMetaMethod::fromSignal(&QRestWrapper::authenticationCheck)) {
-        if(!q->isSignalConnected(signal)) {
+        if(!q->isSignalConnected(signal) &&
+           !q->isSignalConnected(QMetaMethod::fromSignal(&QRestWrapper::authenticationCheckContent))) {
             m_authenticator.setAlternateAuthenticationCheck(false);
+        }
+    } else if (signal == QMetaMethod::fromSignal(&QRestWrapper::authenticationCheckContent)) {
+        if(!q->isSignalConnected(signal) &&
+           !q->isSignalConnected(QMetaMethod::fromSignal(&QRestWrapper::authenticationCheck))) {
+            m_authenticator.setAlternateAuthenticationCheck(false);
+        }
+    } else if (signal == QMetaMethod::fromSignal(&QRestWrapper::authenticatedContent)) {
+        if(!q->isSignalConnected(signal)) {
+            m_authenticator.setFetchContentOnAuthenticated(false);
         }
     }
 }

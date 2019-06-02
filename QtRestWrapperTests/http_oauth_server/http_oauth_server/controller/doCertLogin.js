@@ -23,9 +23,9 @@ const doCertLogin = (req, res, next) => {
   const intrmid = encodedId();
   // store the temporary sso token in the cache
   applicationCache.storeApplicationInCache(url.origin, id, intrmid);
-  setTimeout(function() {
+  //setTimeout(function() {
     return redirect ? res.redirect(`${redirect_uri}?ssoToken=${intrmid}`) : res.status(200).json({message: 'success', ssoToken: intrmid});
-  }, 5000);
+  //}, 5000);
   // redirect
   
 };

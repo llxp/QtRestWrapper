@@ -15,14 +15,21 @@ public:
     QRestWrapperTest();
     ~QRestWrapperTest();
 
-private slots:
+public slots:
     void initTestCase();
-    void test_case1();
+    void setStoragePathTest();
+    void setAuthenticationTestUrlTest();
+    void setApplicationUrlTest();
+    void authenticateCustomTest();
+    void authenticateCustomWithoutWindowTest();
+    void authenticateImplementedTest();
     void cleanupTestCase();
 
 private:
     QRestWrapper *m_restWrapperInstance;
     QRestWrapperPrivate *m_restWrapperPrivateInstance;
+    bool m_ssoServerLoaded{false};
+    QWidget *m_viewWidget;
 };
 
 }  // namespace QtRestWrapper

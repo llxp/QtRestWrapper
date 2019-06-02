@@ -23,10 +23,13 @@ class QTRESTWRAPPERSHARED_EXPORT QRestWrapperCookieJar : public QNetworkCookieJa
 {
 public:
     explicit QRestWrapperCookieJar(QObject *parent = nullptr);
-    bool insertCookie(const QNetworkCookie &cookie);
-    bool deleteCookie(const QNetworkCookie &cookie);
-    bool updateCookie(const QNetworkCookie &cookie);
-    bool validateCookie(const QNetworkCookie &cookie, const QUrl &url) const;
+    virtual ~QRestWrapperCookieJar() override;
+
+public:
+    virtual bool insertCookie(const QNetworkCookie &cookie) override;
+    virtual bool deleteCookie(const QNetworkCookie &cookie) override;
+    virtual bool updateCookie(const QNetworkCookie &cookie) override;
+    virtual bool validateCookie(const QNetworkCookie &cookie, const QUrl &url) const override;
 
 public:
     void deleteCookiesByName(const QString &cookieName);

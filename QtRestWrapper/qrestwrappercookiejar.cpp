@@ -10,6 +10,10 @@ QRestWrapperCookieJar::QRestWrapperCookieJar(QObject *parent) : QNetworkCookieJa
 
 }
 
+QRestWrapperCookieJar::~QRestWrapperCookieJar()
+{
+}
+
 bool QRestWrapperCookieJar::insertCookie(const QNetworkCookie &cookie)
 {
     if(getCookiesByNameAndDomainAndPath(cookie.name(), cookie.domain(), cookie.path()).size() <= 0) {
