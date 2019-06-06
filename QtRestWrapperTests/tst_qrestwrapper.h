@@ -1,11 +1,30 @@
 #ifndef TST_QRESTWRAOOER_H
 #define TST_QRESTWRAOOER_H
 
+#include <QEvent>
+#include <QMainWindow>
 #include <QObject>
 #include "../QtRestWrapper/qrestwrapper.h"
 
 namespace QtRestWrapper {
 
+class TempWindow : public QMainWindow
+{
+    Q_OBJECT
+public:
+    explicit TempWindow(QWidget *parent = nullptr) : QMainWindow(parent) {}
+
+signals:
+    void closed();
+
+protected:
+    virtual bool event(QEvent *event) override {
+        if(event->type() == QEvent::Close) {
+            closed();
+        }
+        return QMainWindow::event(event);
+    }
+};
 
 class QRestWrapperTest : public QObject
 {
@@ -15,15 +34,22 @@ public:
     QRestWrapperTest();
     ~QRestWrapperTest();
 
-public slots:
+private slots:
     void initTestCase();
-    void setStoragePathTest();
-    void setAuthenticationTestUrlTest();
     void setApplicationUrlTest();
+    void setStoragePathTest();
     void authenticateCustomTest();
-    void authenticateCustomWithoutWindowTest();
-    void authenticateImplementedTest();
     void cleanupTestCase();
+public:
+    void webengineTest();
+    void authenticatorTest();
+    void authenticatorTest2();
+
+    void setAuthenticationTestUrlTest();
+
+    //void authenticateCustomTest();
+    //void authenticateCustomWithoutWindowTest();
+    //void authenticateImplementedTest();
 
 private:
     QRestWrapper *m_restWrapperInstance;

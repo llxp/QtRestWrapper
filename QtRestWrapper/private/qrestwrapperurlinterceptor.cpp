@@ -1,5 +1,4 @@
 #include "qrestwrapperurlinterceptor.h"
-#include "qrestwrapper.h"
 #include "qrestwrapperauthenticator.h"
 
 #include <QRegularExpression>
@@ -18,7 +17,9 @@ public:
     }
 };
 
-QRestWrapperUrlInterceptor::QRestWrapperUrlInterceptor(QRestWrapperAuthenticator *restWrapper, QObject *parent) : QWebEngineUrlRequestInterceptor(parent), m_restWrapperAuthenticator(restWrapper)
+QRestWrapperUrlInterceptor::QRestWrapperUrlInterceptor(QRestWrapperAuthenticator *restWrapper, QObject *parent)
+    : QWebEngineUrlRequestInterceptor(parent),
+      m_restWrapperAuthenticator(restWrapper)
 {
 
 }
@@ -29,15 +30,17 @@ void QRestWrapperUrlInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info
     bool shouldBeAllowed = false;
 
     // cast to the temp class to get access to the filter lists
-    QRestWrapperAuthenticatorTemp *ptr = static_cast<QRestWrapperAuthenticatorTemp *>(m_restWrapperAuthenticator);
+    if(m_restWrapperAuthenticator != nullptr) {
+        QRestWrapperAuthenticatorTemp *ptr = static_cast<QRestWrapperAuthenticatorTemp *>(m_restWrapperAuthenticator);
 
-    shouldBeAllowed = checkForAllowedList(ptr->getAllowedUrlPatterns(), info.requestUrl());
-    shouldBeAllowed = checkForForbiddenList(ptr->getForbiddenUrlPatterns(), info.requestUrl());
+        shouldBeAllowed = checkForAllowedList(ptr->getAllowedUrlPatterns(), info.requestUrl());
+        shouldBeAllowed = checkForForbiddenList(ptr->getForbiddenUrlPatterns(), info.requestUrl());
 
-    // check if the request should be blocked
-    if(shouldBeAllowed == false) {
-        // block the request
-        info.block(true);
+        // check if the request should be blocked
+        if(shouldBeAllowed == false) {
+            // block the request
+            info.block(true);
+        }
     }
     // invoke the signal, to check, if the current
     // url is the successful authentication url

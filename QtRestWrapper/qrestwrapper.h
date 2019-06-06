@@ -2,7 +2,6 @@
 #define QTRESTWRAPPER_H
 
 #include "qrestwrappercertificateerror.h"
-#include "qrestwrappercookiejar.h"
 #include "qtrestwrapper_global.h"
 
 #include <QMap>
@@ -93,8 +92,8 @@ signals:
     void addWebView(QWidget *view);
     // will be called when the authentication phase is over
     // when the webview should be detached from a widget, this signal has to be connected
-    // if not connected, the shown webengineview will closed
-    void removeWebView(QWidget *view);
+    // if not connected, the shown webengineview will be closed
+    void closed();
     // will be called, when the authenticated reached the point of a valid authenticated
     void authenticated(const QUrl &url);
     void authenticatedContent(const QUrl &url, const QByteArray &content);

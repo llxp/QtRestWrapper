@@ -3,7 +3,10 @@
 
 #include <QObject>
 
-#include "../QtRestWrapper/qrestwrapperauthenticator.h"
+#include "../QtRestWrapper/qrestwrappercertificateerror.h"
+#include "../QtRestWrapper/private/qrestwrapperauthenticator.h"
+#include "../QtRestWrapper/private/qrestwrapperurlinterceptor.h"
+
 
 namespace QtRestWrapper {
 

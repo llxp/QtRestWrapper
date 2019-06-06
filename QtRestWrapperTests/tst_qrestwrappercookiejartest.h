@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "../QtRestWrapper/qrestwrappercookiejar.h"
+#include "../QtRestWrapper/private/qrestwrappercookiejar.h"
 
 namespace QtRestWrapper {
 

@@ -1,5 +1,4 @@
 #include "tst_qrestwrapperurlinterceptortest.h"
-#include "../QtRestWrapper/qrestwrapperurlinterceptor.h"
 
 using namespace QtRestWrapper;
 

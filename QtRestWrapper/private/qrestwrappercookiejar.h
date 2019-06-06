@@ -10,7 +10,7 @@
 
 #include <tuple>
 
-#include "qtrestwrapper_global.h"
+#include "../qtrestwrapper_global.h"
 
 template<class _This, class... _Rest>
 using QTuple = typename std::tuple<_This, _Rest...>;

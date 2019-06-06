@@ -1,6 +1,5 @@
 #include "qrestwrapper.h"
-#include "qrestwrapper_p.h"
-#include "qrestwrapperauthenticator.h"
+#include "private/qrestwrapper_p.h"
 
 #include <QWebEngineUrlRequestInfo>
 #include <QWebEngineUrlRequestInterceptor>

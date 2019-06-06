@@ -3,7 +3,7 @@
 
 #include <QWebEngineUrlRequestInterceptor>
 
-#include "qtrestwrapper_global.h"
+#include "../qtrestwrapper_global.h"
 
 namespace QtRestWrapper {
 

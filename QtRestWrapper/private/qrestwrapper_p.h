@@ -3,7 +3,7 @@
 
 #include "qrestwrappercookiejar.h"
 #include "qrestwrapperurlinterceptor.h"
-#include "qrestwrapper.h"
+#include "../qrestwrapper.h"
 #include "qrestwrapperauthenticator.h"
 #include "qrestwrappernetworkhandler.h"
 
@@ -79,8 +79,8 @@ protected:
     void disconnectNotify(const QMetaMethod &signal);
 
 protected:
-    QRestWrapperAuthenticator m_authenticator;
-    QRestWrapperNetworkHandler m_networkHandler;
+    QRestWrapperAuthenticator *m_authenticator;
+    QRestWrapperNetworkHandler *m_networkHandler;
 
 private:
     QRestWrapper *q_ptr;

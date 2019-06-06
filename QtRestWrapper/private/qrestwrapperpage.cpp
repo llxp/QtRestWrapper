@@ -9,12 +9,23 @@
 #include <QWebEngineSettings>
 
 QRestWrapperPage::QRestWrapperPage(QObject *parent)
-    : QWebEnginePage(QWebEngineProfile::defaultProfile(), parent)
+    : QWebEnginePage(new QWebEngineProfile(parent), /*create a dummy object*/new QObject(parent))
 {
-    profile()->setParent(this);
+    //profile()->setParent(parent);
     profile()->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
-    settings()->setAttribute(QWebEngineSettings::AutoLoadImages, false);
-    settings()->setAttribute(QWebEngineSettings::AutoLoadIconsForPage, false);
+    //settings()->setAttribute(QWebEngineSettings::AutoLoadImages, false);
+    //settings()->setAttribute(QWebEngineSettings::AutoLoadIconsForPage, false);
+}
+
+QRestWrapperPage::~QRestWrapperPage()
+{
+    disconnect();
+    qDebug() << __FUNCTION__;
+    //profile()->setParent(nullptr);
+    profile()->disconnect();
+    profile()->setRequestInterceptor(nullptr);
+    //delete profile();
+    //profile()->deleteLater();
 }
 
 void QRestWrapperPage::setRequestInterceptor(QWebEngineUrlRequestInterceptor *requestInterceptor)
@@ -33,7 +44,7 @@ void QRestWrapperPage::setPersistentStoragePath(const QString &path)
 }
 
 
-QStringList QRestWrapperPage::chooseFiles(QWebEnginePage::FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes)
+/*QStringList QRestWrapperPage::chooseFiles(QWebEnginePage::FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes)
 {
     qDebug() << __FUNCTION__;
     QFileDialog openFileDialog(qobject_cast<QWidget *>(this->parent()));
@@ -90,7 +101,7 @@ void QRestWrapperPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsol
         qWarning() << "WARNING: " << message << "\n" << "on line: " << lineNumber << " in " << sourceID;
         break;
     }
-}
+}*/
 
 bool QRestWrapperPage::certificateError(const QWebEngineCertificateError &certificateError)
 {

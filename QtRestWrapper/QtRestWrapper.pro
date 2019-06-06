@@ -26,25 +26,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         qrestwrapper.cpp \
-        qrestwrapper_p.cpp \
-        qrestwrapperauthenticator.cpp \
+        private/qrestwrapper_p.cpp \
+        private/qrestwrapperauthenticator.cpp \
         qrestwrappercertificateerror.cpp \
-        qrestwrappercookiejar.cpp \
-        qrestwrappernetworkhandler.cpp \
-        qrestwrapperpage.cpp \
-        qrestwrapperurlinterceptor.cpp \
-        qrestwrapperutils.cpp
+        private/qrestwrappercookiejar.cpp \
+        private/qrestwrappernetworkhandler.cpp \
+        private/qrestwrapperpage.cpp \
+        private/qrestwrapperurlinterceptor.cpp \
+        private/qrestwrapperutils.cpp \
+        private/qrestwrapperview.cpp
 
 HEADERS += \
         qrestwrapper.h \
-        qrestwrapper_p.h \
-        qrestwrapperauthenticator.h \
+        private/qrestwrapper_p.h \
+        private/qrestwrapperauthenticator.h \
         qrestwrappercertificateerror.h \
-        qrestwrappercookiejar.h \
-        qrestwrappernetworkhandler.h \
-        qrestwrapperpage.h \
-        qrestwrapperurlinterceptor.h \
-        qrestwrapperutils.h \
+        private/qrestwrappercookiejar.h \
+        private/qrestwrappernetworkhandler.h \
+        private/qrestwrapperpage.h \
+        private/qrestwrapperurlinterceptor.h \
+        private/qrestwrapperutils.h \
+        private/qrestwrapperview.h \
         qtrestwrapper_global.h
 
 unix {

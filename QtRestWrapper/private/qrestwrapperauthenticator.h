@@ -1,10 +1,11 @@
 #ifndef QRESTWRAPPERURLCHECKER_H
 #define QRESTWRAPPERURLCHECKER_H
 
-#include "qrestwrappercertificateerror.h"
+#include "../qrestwrappercertificateerror.h"
 #include "qrestwrappercookiejar.h"
 #include "qrestwrapperpage.h"
 #include "qrestwrapperurlinterceptor.h"
+#include "qrestwrapperview.h"
 
 #include <QNetworkReply>
 #include <QObject>
@@ -62,7 +63,7 @@ signals:
     // will be called when the authentication phase is over
     // when the webview should be detached from a widget, this signal has to be connected
     // if not connected, the shown webengineview will closed
-    void removeWebView(QWidget *view);
+    void closed();
     // will be called, when the authenticated reached the point of a valid authenticated
     void authenticated(const QUrl &url);
     void authenticatedContent(const QUrl &url, const QByteArray &content);
@@ -90,7 +91,8 @@ protected:
 protected:
     QRestWrapperCookieJar *m_cookieJar;
     QRestWrapperUrlInterceptor *m_urlInterceptor;
-    QWebEngineView *m_view;
+    QRestWrapperView *m_view;
+    TempWidget *m_tempWidget;
     QRestWrapperPage *m_page;
     QWebEngineCookieStore *m_cookieStore;
     QUrl m_authenticationTestUrl;

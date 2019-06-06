@@ -1,4 +1,5 @@
 #include "qrestwrapperauthenticator.h"
+#include "qrestwrapperview.h"
 
 #include <QMetaMethod>
 #include <QRegularExpression>
@@ -19,8 +20,9 @@ QRestWrapperAuthenticator::QRestWrapperAuthenticator(QObject *parent)
       // set the this pointer to the url interceptor,
       // that it can read the filter lists
       // and invoke authenticationCheck signal
-      m_urlInterceptor(nullptr),
+      m_urlInterceptor(new QRestWrapperUrlInterceptor(this)),
       m_view(nullptr),  // will be instantiated later
+      m_tempWidget(nullptr),
       m_page(nullptr),  // will be instantiated later
       m_cookieStore(nullptr),  // will be assigned later
       m_isAuthenticated(false),
@@ -28,34 +30,49 @@ QRestWrapperAuthenticator::QRestWrapperAuthenticator(QObject *parent)
       m_fetchContentOnAuthenticated(false),
       m_fetchContentOnAuthenticationCheck(false)
 {
+    qDebug() << __FUNCTION__;
 }
 
 QRestWrapperAuthenticator::~QRestWrapperAuthenticator()
 {
-    /*if(m_view != nullptr) {
-        m_view->stop();
-        if(m_view->parentWidget() != nullptr) {
-            m_view->parentWidget()->layout()->removeWidget(m_view);
-        }
-        setParent(nullptr);
+    disconnect();
+    qDebug() << __FUNCTION__;
+    if(m_urlInterceptor != nullptr) {
+        //m_view->stop();
+        //if(m_view->parentWidget() != nullptr && m_view->parentWidget()->layout() != nullptr) {
+        //    m_view->parentWidget()->layout()->removeWidget(m_view);
+        //}
+        //setParent(nullptr);
+        m_urlInterceptor->disconnect();
         m_urlInterceptor->deleteLater();
         m_urlInterceptor = nullptr;
+    }
+    if(m_cookieJar != nullptr) {
+        m_cookieJar->disconnect();
         m_cookieJar->deleteLater();
         m_cookieJar = nullptr;
+    }
+    if(m_tempWidget != nullptr) {
+        m_tempWidget->disconnect();
+        m_tempWidget->deleteLater();
+        m_tempWidget = nullptr;
+    }
+    if(m_view != nullptr && m_view->parentWidget() == nullptr && m_view->parent() == nullptr) {
+        m_view->disconnect();
         m_view->deleteLater();
         m_view = nullptr;
-        m_page->deleteLater();
-        m_page = nullptr;
-    }*/
+    }
 }
 
 void QRestWrapperAuthenticator::authenticate()
 {
     this->m_isAuthenticated = false;
     initWebEngineView();
+    m_cookieJar->clearAllCookies();
+    m_cookieStore->deleteSessionCookies();
+    m_cookieStore->deleteAllCookies();
     emit this->addWebView(m_view);
     if(m_view != nullptr) {
-        this->m_view->show();
         m_view->setEnabled(false);
         this->m_view->setUrl(this->m_applicationUrl);
         m_view->setEnabled(true);
@@ -163,12 +180,14 @@ void QRestWrapperAuthenticator::urlCheckFinished(const QUrl &url)
 {
     this->m_isAuthenticated = true;
     m_view->setEnabled(false);
+
+    //disconnect(m_cookieStore, &QWebEngineCookieStore::cookieAdded, m_cookieJar, &QRestWrapperCookieJar::insertCookie);
+    //disconnect(m_cookieStore, &QWebEngineCookieStore::cookieRemoved, m_cookieJar, &QRestWrapperCookieJar::deleteCookie);
+
+    disconnect(m_view, &QWebEngineView::urlChanged, this, &QRestWrapperAuthenticator::checkUrlForAuthentication);
+
     disconnect(m_page, &QRestWrapperPage::certificateErrorSignal, this, &QRestWrapperAuthenticator::certificateError);
     disconnect(m_page, &QWebEnginePage::selectClientCertificate, this, &QRestWrapperAuthenticator::clientCertificateNeeded);
-    disconnect(m_cookieStore, &QWebEngineCookieStore::cookieAdded, m_cookieJar, &QRestWrapperCookieJar::insertCookie);
-    disconnect(m_cookieStore, &QWebEngineCookieStore::cookieRemoved, m_cookieJar, &QRestWrapperCookieJar::deleteCookie);
-    disconnect(m_view, &QWebEngineView::urlChanged, this, &QRestWrapperAuthenticator::checkUrlForAuthentication);
-    disconnect(m_page, &QRestWrapperPage::certificateErrorSignal, this, &QRestWrapperAuthenticator::certificateError);
 
     disconnect(this->m_urlInterceptor, &QRestWrapperUrlInterceptor::checkAuthenticationPage, this, &QRestWrapperAuthenticator::checkUrlForAuthentication);
 
@@ -179,76 +198,87 @@ void QRestWrapperAuthenticator::urlCheckFinished(const QUrl &url)
             if(ok) {
                 this->m_page->toHtml([this, url](const QString &html) {
                     m_view->stop();
-                    if(m_view->parentWidget() != nullptr) {
+                    if(m_view->parentWidget() != nullptr && m_view->parentWidget()->layout() != nullptr) {
                         m_view->parentWidget()->layout()->removeWidget(m_view);
                     }
-                    setParent(nullptr);
-                    m_urlInterceptor->deleteLater();
-                    m_urlInterceptor = nullptr;
-                    m_cookieJar->deleteLater();
-                    m_cookieJar = nullptr;
-                    m_view->deleteLater();
-                    m_view = nullptr;
-                    m_page->deleteLater();
-                    m_page = nullptr;
+                    m_view->setParent(nullptr);
                     emit this->authenticatedContent(url, html.toUtf8());
+                    if(m_tempWidget != nullptr) {
+                        m_tempWidget->disconnect();
+                        m_tempWidget->deleteLater();
+                        m_tempWidget = nullptr;
+                    }
+                    if(m_view != nullptr && m_view->parentWidget() == nullptr && m_view->parent() == nullptr) {
+                        m_view->disconnect();
+                        m_view->deleteLater();
+                        m_view = nullptr;
+                    }
                 });
             } else {
                 m_view->stop();
-                if(m_view->parentWidget() != nullptr) {
+                if(m_view->parentWidget() != nullptr && m_view->parentWidget()->layout() != nullptr) {
                     m_view->parentWidget()->layout()->removeWidget(m_view);
                 }
-                setParent(nullptr);
-                m_urlInterceptor->deleteLater();
-                m_urlInterceptor = nullptr;
-                m_cookieJar->deleteLater();
-                m_cookieJar = nullptr;
-                m_view->deleteLater();
-                m_view = nullptr;
-                m_page->deleteLater();
-                m_page = nullptr;
+                m_view->setParent(nullptr);
                 emit this->authenticatedContent(url, "");
+                if(m_tempWidget != nullptr) {
+                    m_tempWidget->disconnect();
+                    m_tempWidget->deleteLater();
+                    m_tempWidget = nullptr;
+                }
+                if(m_view != nullptr && m_view->parentWidget() == nullptr && m_view->parent() == nullptr) {
+                    m_view->disconnect();
+                    m_view->deleteLater();
+                    m_view = nullptr;
+                }
             }
         });
     } else {
         m_view->stop();
         qDebug() << "deleting page and profile.";
-        if(m_view->parentWidget() != nullptr) {
+        if(m_view->parentWidget() != nullptr && m_view->parentWidget()->layout() != nullptr) {
             m_view->parentWidget()->layout()->removeWidget(m_view);
         }
-        setParent(nullptr);
-        m_urlInterceptor->deleteLater();
-        m_urlInterceptor = nullptr;
-        m_cookieJar->deleteLater();
-        m_cookieJar = nullptr;
-        m_view->deleteLater();
-        m_view = nullptr;
-        m_page->deleteLater();
-        m_page = nullptr;
+        m_view->setParent(nullptr);
         qDebug() << "...";
         emit this->authenticated(url);
+        if(m_tempWidget != nullptr) {
+            m_tempWidget->disconnect();
+            m_tempWidget->deleteLater();
+            m_tempWidget = nullptr;
+        }
+        if(m_view != nullptr && m_view->parentWidget() == nullptr && m_view->parent() == nullptr) {
+            m_view->disconnect();
+            m_view->deleteLater();
+            m_view = nullptr;
+        }
     }
 }
 
 void QRestWrapperAuthenticator::initWebEngineView()
 {
-    if(m_cookieJar != nullptr) {
-        m_cookieJar->deleteLater();
-    }
-    m_cookieJar = new QRestWrapperCookieJar();
-    m_cookieJar->clearAllCookies();
-    if(m_view != nullptr) {
-        m_view->deleteLater();
-    }
-    m_view = new QWebEngineView(nullptr);
-    //m_view->setAttribute(Qt::WA_DeleteOnClose, true);
+    m_view = new QRestWrapperView(nullptr);
+    m_page = new QRestWrapperPage(m_view);
+    m_cookieStore = m_view->page()->profile()->cookieStore();
+    m_tempWidget = m_view->tempWidget();
+    m_page->setRequestInterceptor(m_urlInterceptor);
+    m_view->setPage(m_page);
+    connect(m_tempWidget, &TempWidget::closedEvent, this, &QRestWrapperAuthenticator::closed);
+    //if(m_cookieJar != nullptr) {
+    //    m_cookieJar->deleteLater();
+    //}
+    //m_cookieJar = new QRestWrapperCookieJar();
+    //if(m_view != nullptr) {
+    //    m_view->deleteLater();
+    //}
+    //m_view = new QWebEngineView(nullptr);
 
-    m_urlInterceptor = new QRestWrapperUrlInterceptor(this);
-
+    //m_urlInterceptor = new QRestWrapperUrlInterceptor(this);
+    m_urlInterceptor->disconnect();
     connect(m_urlInterceptor, &QRestWrapperUrlInterceptor::checkAuthenticationPage, this, &QRestWrapperAuthenticator::checkUrlForAuthentication);
 
-    m_page = new QRestWrapperPage(m_view);
-    m_page->setRequestInterceptor(m_urlInterceptor);
+    //m_page = new QRestWrapperPage(m_view);
+    //m_page->setRequestInterceptor(m_urlInterceptor);
 
     if(m_storagePath.length() <= 0) {
         m_page->setCachePath(qApp->applicationDirPath() + "/webcache/cache");
@@ -258,17 +288,20 @@ void QRestWrapperAuthenticator::initWebEngineView()
         m_page->setPersistentStoragePath(m_storagePath + "webcache/persistent");
     }
 
-    m_cookieStore = this->m_page->profile()->cookieStore();
+    //m_cookieStore = this->m_page->profile()->cookieStore();
 
+    m_cookieStore->disconnect();
     connect(m_cookieStore, &QWebEngineCookieStore::cookieAdded, m_cookieJar, &QRestWrapperCookieJar::insertCookie);
     connect(m_cookieStore, &QWebEngineCookieStore::cookieRemoved, m_cookieJar, &QRestWrapperCookieJar::deleteCookie);
 
+    m_view->disconnect();
     connect(m_view, &QWebEngineView::urlChanged, this, &QRestWrapperAuthenticator::checkUrlForAuthentication);
+    m_page->disconnect();
     connect(m_page, &QRestWrapperPage::certificateErrorSignal, this, &QRestWrapperAuthenticator::certificateError);
 
-    m_view->setPage(m_page);
+    //m_view->setPage(m_page);
 
-    connect(this->m_page, &QWebEnginePage::selectClientCertificate, this, &QRestWrapperAuthenticator::clientCertificateNeeded);
+    connect(m_page, &QWebEnginePage::selectClientCertificate, this, &QRestWrapperAuthenticator::clientCertificateNeeded);
 }
 
 void QRestWrapperAuthenticator::clientCertificateNeeded(QWebEngineClientCertificateSelection clientCertificateSelection)

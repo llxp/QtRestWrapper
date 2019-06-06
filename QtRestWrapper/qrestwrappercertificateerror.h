@@ -5,7 +5,9 @@
 #include <QUrl>
 #include <QString>
 
-class QRestWrapperCertificateError
+#include "qtrestwrapper_global.h"
+
+class QTRESTWRAPPERSHARED_EXPORT QRestWrapperCertificateError
 {
 public:
     enum Error : int {
