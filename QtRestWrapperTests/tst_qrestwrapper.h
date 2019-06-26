@@ -4,6 +4,7 @@
 #include <QEvent>
 #include <QMainWindow>
 #include <QObject>
+#include <QProcess>
 #include "../QtRestWrapper/qrestwrapper.h"
 
 namespace QtRestWrapper {
@@ -36,19 +37,23 @@ public:
 
 private slots:
     void initTestCase();
-    void setApplicationUrlTest();
-    void setStoragePathTest();
-    void authenticateCustomTest();
-    void cleanupTestCase();
-public:
     void webengineTest();
     void authenticatorTest();
     void authenticatorTest2();
+    void setApplicationUrlTest();
+    void setStoragePathTest();
+    void authenticateCustomTest();
+    void authenticateCustomWithoutWindowTest();
+    void authenticateRunJavaScriptTest();
+    void cleanupTestCase();
+public:
+
+
 
     void setAuthenticationTestUrlTest();
 
     //void authenticateCustomTest();
-    //void authenticateCustomWithoutWindowTest();
+
     //void authenticateImplementedTest();
 
 private:
@@ -56,6 +61,10 @@ private:
     QRestWrapperPrivate *m_restWrapperPrivateInstance;
     bool m_ssoServerLoaded{false};
     QWidget *m_viewWidget;
+    QProcess *m_appProcess;
+    QProcess *m_ssoServerProcess;
+    QThread *m_appThread;
+    QThread *m_ssoServerThread;
 };
 
 }  // namespace QtRestWrapper

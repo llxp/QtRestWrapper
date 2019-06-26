@@ -17,4 +17,4 @@ HEADERS += \
     tst_qrestwrappercookiejartest.h \
     tst_qrestwrapperurlinterceptortest.h
 
-LIBS += -L../build-QtRestWrapper-Desktop_Qt_5_12_3_MSVC2017_64bit-Debug/debug
+LIBS += -L../build-QtRestWrapper-Desktop_Qt_5_13_0_MSVC2017_64bit-Debug/debug
