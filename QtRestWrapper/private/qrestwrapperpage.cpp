@@ -7,6 +7,7 @@
 #include <QWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
 #include <QWebEngineSettings>
+#include <QEventLoop>
 
 QRestWrapperPage::QRestWrapperPage(QObject *parent)
     : QWebEnginePage(new QWebEngineProfile(parent), /*create a dummy object*/new QObject(parent))
@@ -44,7 +45,7 @@ void QRestWrapperPage::setPersistentStoragePath(const QString &path)
 }
 
 
-/*QStringList QRestWrapperPage::chooseFiles(QWebEnginePage::FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes)
+QStringList QRestWrapperPage::chooseFiles(QWebEnginePage::FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes)
 {
     qDebug() << __FUNCTION__;
     QFileDialog openFileDialog(qobject_cast<QWidget *>(this->parent()));
@@ -101,7 +102,7 @@ void QRestWrapperPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsol
         qWarning() << "WARNING: " << message << "\n" << "on line: " << lineNumber << " in " << sourceID;
         break;
     }
-}*/
+}
 
 bool QRestWrapperPage::certificateError(const QWebEngineCertificateError &certificateError)
 {

@@ -3,6 +3,7 @@
 
 #include "../qrestwrappercertificateerror.h"
 #include "qrestwrappercookiejar.h"
+#include "qrestwrapperjavascriptinjector.h"
 #include "qrestwrapperpage.h"
 #include "qrestwrapperurlinterceptor.h"
 #include "qrestwrapperview.h"
@@ -55,6 +56,10 @@ public slots:
     QVector<QString> getOriginalCookieStringsByNameAndDomainAndPath(const QString &cookieName, const QString &cookieDomain, const QString &cookiePath) const;
     QVector<QString> getAllCookieStrings() const;
 
+public slots:
+    void runJavaScript(const QString &scriptSource);
+    QVariant runJavaScriptSynchronous(const QString &scriptSource);
+
 signals:
     // will be called during authentication phase
     // when a webengineview has been created, it can be attached to a widget using this signal
@@ -76,6 +81,10 @@ signals:
     // return true to ignore the certificate error, return false to cancel the connection
     bool certificateError(const QRestWrapperCertificateError &error);
 
+signals:
+    // will be called once the script has ended, which has been started by runJavaScript()
+    void scriptEnded(const QVariant &result);
+
 private slots:
     void checkUrlForAuthentication(const QUrl &url);
     void checkUrlForCustomAuthentication(const QUrl &url);
@@ -83,6 +92,10 @@ private slots:
     void urlCheckFinished(const QUrl &url);
     void initWebEngineView();
     void clientCertificateNeeded(QWebEngineClientCertificateSelection clientCertificateSelection);
+
+private:
+    void removeViewAfterAuthentication();
+    void cleanupAfterAuthentication();
 
 protected:
     QVector<QString> m_allowedUrlPatterns;
@@ -102,6 +115,9 @@ protected:
     bool m_alternateAuthenticationCheck;
     bool m_fetchContentOnAuthenticated;
     bool m_fetchContentOnAuthenticationCheck;
+
+protected:
+    QRestWrapperJavascriptInjector *m_javascriptInjector;
 };
 }  // namespace QtRestWrapper
 

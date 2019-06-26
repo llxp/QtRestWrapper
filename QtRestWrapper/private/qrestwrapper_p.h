@@ -69,6 +69,10 @@ public:
     QVector<QString> getAllCookieStrings() const;
 
 public:
+    void runJavaScript(const QString &scriptSource);
+    QVariant runJavaScriptSynchronous(const QString &scriptSource);
+
+public:
     // generates a unique random string, unique only, when only this function will be used to generate the random string
     static QString randomString(int length = 12);
     // utility function to split a cookie string into individual raw cookies

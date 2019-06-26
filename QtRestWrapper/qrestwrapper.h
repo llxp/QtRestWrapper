@@ -43,6 +43,10 @@ public:
     void authenticate();
 
 public:
+    void runJavaScript(const QString &scriptSource);
+    QVariant runJavaScriptSynchronous(const QString &scriptSource);
+
+public:
     void sendGetRequest(const QUrl &url, const QMap<QString, QString> &header = QMap<QString, QString>());
     void sendPutRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
     void sendPutRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &contentType, const QMap<QString, QString> &header = QMap<QString, QString>());
@@ -105,6 +109,10 @@ signals:
     // will be called, if there is a ssl certificate error
     // return true to ignore the certificate error, return false to cancel the connection
     bool certificateError(const QRestWrapperCertificateError &error);
+
+signals:
+    // will be called once the script has ended, which has been started by runJavaScript()
+    void scriptEnded(const QVariant &result);
 
 signals:
     // these signals will be called, once there has been a reply from a rest request

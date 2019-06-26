@@ -52,6 +52,18 @@ void QRestWrapper::authenticate()
     d->authenticate();
 }
 
+void QRestWrapper::runJavaScript(const QString &scriptSource)
+{
+    Q_D(QRestWrapper);
+    d->runJavaScript(scriptSource);
+}
+
+QVariant QRestWrapper::runJavaScriptSynchronous(const QString &scriptSource)
+{
+    Q_D(QRestWrapper);
+    return d->runJavaScriptSynchronous(scriptSource);
+}
+
 void QRestWrapper::sendGetRequest(const QUrl &url, const QMap<QString, QString> &header)
 {
     Q_D(QRestWrapper);

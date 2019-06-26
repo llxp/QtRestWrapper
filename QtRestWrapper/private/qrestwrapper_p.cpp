@@ -17,6 +17,8 @@ QRestWrapperPrivate::QRestWrapperPrivate(QRestWrapper *q)
     q->connect(m_authenticator, &QRestWrapperAuthenticator::authenticationCheckContent, q, &QRestWrapper::authenticationCheckContent);
     q->connect(m_authenticator, &QRestWrapperAuthenticator::certificateError, q, &QRestWrapper::certificateError);
 
+    q->connect(m_authenticator, &QRestWrapperAuthenticator::scriptEnded, q, &QRestWrapper::scriptEnded);
+
     q->connect(m_networkHandler, &QRestWrapperNetworkHandler::contentReady, q, &QRestWrapper::contentReady);
     q->connect(m_networkHandler, &QRestWrapperNetworkHandler::authenticationFailure, q, &QRestWrapper::authenticationFailure);
     q->connect(m_networkHandler, &QRestWrapperNetworkHandler::notFound, q, &QRestWrapper::notFound);
@@ -205,6 +207,16 @@ QVector<QString> QRestWrapperPrivate::getOriginalCookieStringsByNameAndDomainAnd
 QVector<QString> QRestWrapperPrivate::getAllCookieStrings() const
 {
     return m_authenticator->getAllCookieStrings();
+}
+
+void QRestWrapperPrivate::runJavaScript(const QString &scriptSource)
+{
+    m_authenticator->runJavaScript(scriptSource);
+}
+
+QVariant QRestWrapperPrivate::runJavaScriptSynchronous(const QString &scriptSource)
+{
+    return m_authenticator->runJavaScriptSynchronous(scriptSource);
 }
 
 QString QRestWrapperPrivate::randomString(int length)

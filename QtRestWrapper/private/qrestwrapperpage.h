@@ -22,11 +22,11 @@ public slots:
 
     // QWebEnginePage interface
 private:
-    //virtual QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes) override;
-    //virtual void javaScriptAlert(const QUrl &securityOrigin, const QString &msg) override;
-    //virtual bool javaScriptConfirm(const QUrl &securityOrigin, const QString &msg) override;
-    //virtual bool javaScriptPrompt(const QUrl &securityOrigin, const QString &msg, const QString &defaultValue, QString *result) override;
-    //virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID) override;
+    virtual QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes) override;
+    virtual void javaScriptAlert(const QUrl &securityOrigin, const QString &msg) override;
+    virtual bool javaScriptConfirm(const QUrl &securityOrigin, const QString &msg) override;
+    virtual bool javaScriptPrompt(const QUrl &securityOrigin, const QString &msg, const QString &defaultValue, QString *result) override;
+    virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID) override;
     virtual bool certificateError(const QWebEngineCertificateError &certificateError) override;
 
 signals:
