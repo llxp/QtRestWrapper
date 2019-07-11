@@ -326,6 +326,7 @@ void QRestWrapperAuthenticator::clientCertificateNeeded(QWebEngineClientCertific
 
 void QRestWrapperAuthenticator::removeViewAfterAuthentication()
 {
+    qDebug() << __FUNCTION__;
     m_view->stop();
     if(m_view->parentWidget() != nullptr && m_view->parentWidget()->layout() != nullptr) {
         m_view->parentWidget()->layout()->removeWidget(m_view);
@@ -335,6 +336,7 @@ void QRestWrapperAuthenticator::removeViewAfterAuthentication()
 
 void QRestWrapperAuthenticator::cleanupAfterAuthentication()
 {
+    qDebug() << __FUNCTION__;
     if(m_tempWidget != nullptr) {
         m_tempWidget->disconnect();
         m_tempWidget->deleteLater();

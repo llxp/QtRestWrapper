@@ -340,6 +340,7 @@ void QRestWrapperTest::setApplicationUrlTest()
 
 void QRestWrapperTest::authenticateCustomTest()
 {
+    m_ssoServerLoaded = false;
     QEventLoop loop;
     qDebug() << __FUNCTION__;
     //m_restWrapperInstance->disconnect();
@@ -393,16 +394,18 @@ void QRestWrapperTest::authenticateCustomTest()
 
 void QRestWrapperTest::authenticateCustomWithoutWindowTest()
 {
+    m_ssoServerLoaded = false;
     QEventLoop loop;
     qDebug() << __FUNCTION__;
     m_restWrapperInstance->disconnect();
-    connect(m_restWrapperInstance, &QRestWrapper::certificateError, [](const QRestWrapperCertificateError &error) {
+    connect(m_restWrapperInstance, &QRestWrapper::certificateError,
+            [](const QRestWrapperCertificateError &error) {
         // ignore all errors related to self signed certificates
         return true;
     });
     QUrl *finalUrl = new QUrl("https://localhost/");
     connect(m_restWrapperInstance, &QRestWrapper::closed, [&loop]() {
-        qDebug() << "closed in QRestWrapperTest";
+        qDebug() << "closed in QRestWrapperTest 2";
         loop.quit();
     });
     connect(m_restWrapperInstance, &QRestWrapper::authenticated, [&finalUrl, this](const QUrl &url) {
@@ -411,8 +414,10 @@ void QRestWrapperTest::authenticateCustomWithoutWindowTest()
         *finalUrl = url;
         m_viewWidget->close();
     });
-    connect(m_restWrapperInstance, &QRestWrapper::authenticationCheckContent, [this](const QUrl &url, const QByteArray &content) {
+    connect(m_restWrapperInstance, &QRestWrapper::authenticationCheckContent,
+            [this](const QUrl &url, const QByteArray &content) {
         qDebug() << "current url: " << url;
+        qDebug() << "content: " << content;
         if(url.toString().startsWith("https://localhost:3001/simplesso/login")) {
             qDebug() << "incrementing i";
             m_ssoServerLoaded = true;
@@ -420,15 +425,21 @@ void QRestWrapperTest::authenticateCustomWithoutWindowTest()
         if(m_ssoServerLoaded && url == QUrl("https://localhost:3000/protectedContent")) {
             qDebug() << "returning true";
             return true;
-        } else if(content == "<html><head></head><body><h1>protected content</h1></body></html>" && url == QUrl("https://localhost:3000/protectedContent")) {
+        } else if(content == "<html><head></head><body><h1>protected content</h1></body></html>"
+                  && url == QUrl("https://localhost:3000/protectedContent")) {
             qDebug() << "returning true";
             return true;
         }
+        qDebug() << "returning false";
         return false;
     });
     connect(m_restWrapperInstance, &QRestWrapper::addWebView, [this](QWidget *widget) {
         qDebug() << "adding web view";
         m_viewWidget = widget;
+        widget->setParent(nullptr);
+        widget->setWindowFlag(Qt::Window, true);
+        widget->show();
+        widget->showNormal();
     });
     m_restWrapperInstance->authenticate();
     //QSignalSpy spy(m_restWrapperInstance, &QRestWrapper::closed);
@@ -442,6 +453,7 @@ void QRestWrapperTest::authenticateCustomWithoutWindowTest()
 
 void QRestWrapperTest::authenticateRunJavaScriptTest()
 {
+    m_ssoServerLoaded = false;
     QEventLoop loop;
     qDebug() << __FUNCTION__;
     m_restWrapperInstance->disconnect();
@@ -450,15 +462,18 @@ void QRestWrapperTest::authenticateRunJavaScriptTest()
         return true;
     });
     QUrl *finalUrl = new QUrl("https://localhost/");
-    connect(m_restWrapperInstance, &QRestWrapper::closed, [&loop]() {
-        qDebug() << "closed in QRestWrapperTest";
+    TempWindow *newWindow = new TempWindow();
+    connect(newWindow, &TempWindow::closed, [&loop]() {
+        qDebug() << "closed.";
+        //loop.exit(0);
         loop.quit();
     });
-    connect(m_restWrapperInstance, &QRestWrapper::authenticated, [&finalUrl, this](const QUrl &url) {
+    connect(m_restWrapperInstance, &QRestWrapper::authenticated, [&finalUrl, &newWindow](const QUrl &url) {
         qDebug() << "authenticated.";
         QCOMPARE(url, QUrl("https://localhost:3000/protectedContent"));
         *finalUrl = url;
-        m_viewWidget->close();
+        //loop.quit();
+        newWindow->close();
     });
     connect(m_restWrapperInstance, &QRestWrapper::authenticationCheckContent, [this](const QUrl &url, const QByteArray &content) {
         qDebug() << "current url: " << url;
@@ -481,12 +496,74 @@ void QRestWrapperTest::authenticateRunJavaScriptTest()
         }
         return false;
     });
-    connect(m_restWrapperInstance, &QRestWrapper::addWebView, [this](QWidget *widget) {
+    newWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+    newWindow->setLayout(new QVBoxLayout());
+    connect(m_restWrapperInstance, &QRestWrapper::addWebView, [newWindow](QWidget *widget) {
         qDebug() << "adding web view";
-        m_viewWidget = widget;
+        widget->setParent(newWindow);
+        newWindow->setCentralWidget(widget);
+        newWindow->show();
     });
     m_restWrapperInstance->authenticate();
     loop.exec();
+    qDebug() << __FUNCTION__;
+    QCOMPARE(*finalUrl, QUrl("https://localhost:3000/protectedContent"));
+
+    /*m_ssoServerLoaded = false;
+    QEventLoop loop;
+    qDebug() << __FUNCTION__;
+    //m_restWrapperInstance->disconnect();
+    connect(m_restWrapperInstance, &QRestWrapper::certificateError, [](const QRestWrapperCertificateError &error) {
+        // ignore all errors related to self signed certificates
+        return true;
+    });
+    QUrl *finalUrl = new QUrl("https://localhost/");
+    TempWindow *newWindow = new TempWindow();
+    connect(newWindow, &TempWindow::closed, [&loop]() {
+        qDebug() << "closed.";
+        //loop.exit(0);
+        loop.quit();
+    });
+    connect(m_restWrapperInstance, &QRestWrapper::authenticated, [&finalUrl, &newWindow](const QUrl &url) {
+        qDebug() << "authenticated.";
+        QCOMPARE(url, QUrl("https://localhost:3000/protectedContent"));
+        *finalUrl = url;
+        //loop.quit();
+        newWindow->close();
+    });
+    connect(m_restWrapperInstance, &QRestWrapper::authenticationCheckContent, [this](const QUrl &url, const QByteArray &content) {
+        qDebug() << "current url: " << url;
+        if(m_ssoServerLoaded == false) {
+            QVariant result = m_restWrapperInstance->runJavaScriptSynchronous("function test() {return \"test\";} test();");
+            if(result == "test") {
+                qDebug() << "result is equal to \"test\"";
+            }
+        }
+        if(url.toString().startsWith("https://localhost:3001/simplesso/login")) {
+            qDebug() << "incrementing i";
+            m_ssoServerLoaded = true;
+        }
+        if(m_ssoServerLoaded && url == QUrl("https://localhost:3000/protectedContent")) {
+            qDebug() << "returning true";
+            return true;
+        } else if(content == "<html><head></head><body><h1>protected content</h1></body></html>" && url == QUrl("https://localhost:3000/protectedContent")) {
+            qDebug() << "returning true";
+            return true;
+        }
+        return false;
+    });
+    newWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+    newWindow->setLayout(new QVBoxLayout());
+    connect(m_restWrapperInstance, &QRestWrapper::addWebView, [newWindow](QWidget *widget) {
+        qDebug() << "adding web view";
+        widget->setParent(newWindow);
+        newWindow->setCentralWidget(widget);
+        newWindow->show();
+    });
+    m_restWrapperInstance->authenticate();
+    loop.exec();
+    qDebug() << __FUNCTION__;
+    QCOMPARE(*finalUrl, QUrl("https://localhost:3000/protectedContent"));*/
 }
 
 /*void QRestWrapperTest::authenticateImplementedTest()

@@ -24,7 +24,6 @@ class QWebEnginePage;
 namespace QtRestWrapper {
 
 class QRestWrapperUrlInterceptor;
-class QRestWrapperTest;
 
 class QRestWrapperPrivate;
 

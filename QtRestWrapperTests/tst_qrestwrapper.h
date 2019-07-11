@@ -43,11 +43,10 @@ private slots:
     void setApplicationUrlTest();
     void setStoragePathTest();
     void authenticateCustomTest();
-    void authenticateCustomWithoutWindowTest();
     void authenticateRunJavaScriptTest();
     void cleanupTestCase();
 public:
-
+    void authenticateCustomWithoutWindowTest();
 
 
     void setAuthenticationTestUrlTest();
