@@ -1,5 +1,5 @@
-#include "qrestwrapperurlinterceptor.h"
-#include "qrestwrapperauthenticator.h"
+#include "../../include/private/qrestwrapperurlinterceptor.h"
+#include "../../include/private/qrestwrapperauthenticator.h"
 
 #include <QRegularExpression>
 #include <QWebEngineUrlRequestInterceptor>

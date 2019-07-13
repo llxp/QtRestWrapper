@@ -1,4 +1,5 @@
-#include "qrestwrapperview.h"
+#include "../../include/private/qrestwrapperview.h"
+
 #include <QWebEngineProfile>
 #include <QLayout>
 #include <QCloseEvent>

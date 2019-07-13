@@ -1,5 +1,5 @@
-#include "qrestwrapperauthenticator.h"
-#include "qrestwrapperview.h"
+#include "../../include/private/qrestwrapperauthenticator.h"
+#include "../../include/private/qrestwrapperview.h"
 
 #include <QMetaMethod>
 #include <QRegularExpression>

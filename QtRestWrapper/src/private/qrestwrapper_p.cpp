@@ -1,6 +1,6 @@
-#include "../qrestwrapper.h"
-#include "qrestwrapper_p.h"
-#include "qrestwrapperutils.h"
+#include "../../include/qrestwrapper.h"
+#include "../../include/private/qrestwrapper_p.h"
+#include "../../include/private/qrestwrapperutils.h"
 
 namespace QtRestWrapper {
 

@@ -1,4 +1,4 @@
-#include "qrestwrappercookiejar.h"
+#include "../../include/private/qrestwrappercookiejar.h"
 
 #include <QNetworkCookie>
 #include <QVector>

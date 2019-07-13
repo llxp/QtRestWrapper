@@ -25,31 +25,31 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        private/qrestwrapperjavascriptinjector.cpp \
-        qrestwrapper.cpp \
-        private/qrestwrapper_p.cpp \
-        private/qrestwrapperauthenticator.cpp \
-        qrestwrappercertificateerror.cpp \
-        private/qrestwrappercookiejar.cpp \
-        private/qrestwrappernetworkhandler.cpp \
-        private/qrestwrapperpage.cpp \
-        private/qrestwrapperurlinterceptor.cpp \
-        private/qrestwrapperutils.cpp \
-        private/qrestwrapperview.cpp
+        src/private/qrestwrapperjavascriptinjector.cpp \
+        src/qrestwrapper.cpp \
+        src/private/qrestwrapper_p.cpp \
+        src/private/qrestwrapperauthenticator.cpp \
+        src/qrestwrappercertificateerror.cpp \
+        src/private/qrestwrappercookiejar.cpp \
+        src/private/qrestwrappernetworkhandler.cpp \
+        src/private/qrestwrapperpage.cpp \
+        src/private/qrestwrapperurlinterceptor.cpp \
+        src/private/qrestwrapperutils.cpp \
+        src/private/qrestwrapperview.cpp
 
 HEADERS += \
-        private/qrestwrapperjavascriptinjector.h \
-        qrestwrapper.h \
-        private/qrestwrapper_p.h \
-        private/qrestwrapperauthenticator.h \
-        qrestwrappercertificateerror.h \
-        private/qrestwrappercookiejar.h \
-        private/qrestwrappernetworkhandler.h \
-        private/qrestwrapperpage.h \
-        private/qrestwrapperurlinterceptor.h \
-        private/qrestwrapperutils.h \
-        private/qrestwrapperview.h \
-        qtrestwrapper_global.h
+        include/private/qrestwrapperjavascriptinjector.h \
+        include/qrestwrapper.h \
+        include/private/qrestwrapper_p.h \
+        include/private/qrestwrapperauthenticator.h \
+        include/qrestwrappercertificateerror.h \
+        include/private/qrestwrappercookiejar.h \
+        include/private/qrestwrappernetworkhandler.h \
+        include/private/qrestwrapperpage.h \
+        include/private/qrestwrapperurlinterceptor.h \
+        include/private/qrestwrapperutils.h \
+        include/private/qrestwrapperview.h \
+        include/qtrestwrapper_global.h
 
 unix {
     target.path = /usr/lib

@@ -1,4 +1,4 @@
-#include "qrestwrapperjavascriptinjector.h"
+#include "../../include/private/qrestwrapperjavascriptinjector.h"
 
 #include <QEventLoop>
 #include <QTimer>

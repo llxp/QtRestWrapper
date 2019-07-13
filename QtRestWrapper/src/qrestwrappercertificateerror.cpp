@@ -1,4 +1,4 @@
-#include "qrestwrappercertificateerror.h"
+#include "../include/qrestwrappercertificateerror.h"
 
 QRestWrapperCertificateError::QRestWrapperCertificateError(Error error, QString errorDescription, bool isOverridable, QUrl url)
     : m_error(error),

@@ -1,4 +1,4 @@
-#include "qrestwrapperpage.h"
+#include "../../include/private/qrestwrapperpage.h"
 
 #include <QFileDialog>
 #include <QInputDialog>

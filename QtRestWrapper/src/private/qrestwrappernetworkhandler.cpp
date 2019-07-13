@@ -1,5 +1,5 @@
-#include "qrestwrappernetworkhandler.h"
-#include "qrestwrapperutils.h"
+#include "../../include/private/qrestwrappernetworkhandler.h"
+#include "../../include/private/qrestwrapperutils.h"
 
 #include <QNetworkRequest>
 

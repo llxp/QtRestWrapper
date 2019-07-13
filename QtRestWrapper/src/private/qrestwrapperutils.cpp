@@ -1,4 +1,4 @@
-#include "qrestwrapperutils.h"
+#include "../../include/private/qrestwrapperutils.h"
 
 #include <QVector>
 
