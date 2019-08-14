@@ -9,7 +9,7 @@ QRestWrapperCertificateError::QRestWrapperCertificateError(Error error, QString 
 
 }
 
-QRestWrapperCertificateError::Error QRestWrapperCertificateError::error()
+QTRESTWRAPPERSHARED_EXPORT QRestWrapperCertificateError::Error QRestWrapperCertificateError::error() const
 {
     return m_error;
 }

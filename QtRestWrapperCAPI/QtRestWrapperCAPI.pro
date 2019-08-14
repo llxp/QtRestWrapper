@@ -24,9 +24,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        c_structures/qrestwrappercertificateerror_capi.cpp \
+        c_structures/qurl_capi.cpp \
         qtrestwrappercapi.cpp
 
 HEADERS += \
+        c_structures/qrestwrappercertificateerror_c.h \
+        c_structures/qurl_c.h \
         qtrestwrappercapi.h \
         qtrestwrappercapi_global.h 
 
@@ -35,4 +39,5 @@ unix {
     INSTALLS += target
 }
 
+INCLUDEPATH += ../QtRestWrapper/include
 LIBS += -L../build-QtRestWrapper-Desktop_Qt_5_13_0_MSVC2017_64bit-Debug/debug -lQtRestWrapper

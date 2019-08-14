@@ -29,7 +29,7 @@ public:
     QRestWrapperCertificateError(){}
     QRestWrapperCertificateError(Error error, QString errorDescription, bool isOverridable, QUrl url);
     ~QRestWrapperCertificateError(){}
-    Error error();
+    Error error() const;
     QString errorDescription() const;
     bool isOverridable() const;
     QUrl url() const;

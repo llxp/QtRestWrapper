@@ -1,10 +1,15 @@
 #include "qtrestwrappercapi.h"
 
 #include <vector>
+#include <map>
 
-#include "../QtRestWrapper/qrestwrapper.h"
+#include <qrestwrapper.h>
 
 #include <QMutex>
+#include <QWidget>
+
+#include <c_structures/qurl_c.h>
+#include <c_structures/qrestwrappercertificateerror_c.h>
 
 static std::map<int64_t, std::pair<QtRestWrapper::QRestWrapper *, QMutex *>> restWrapperInstances;
 
@@ -23,24 +28,32 @@ int64_t newQtRestWrapperInstance()
     return 0;
 }
 
+QtRestWrapper::QRestWrapper *getInstance(int64_t index) {
+    return restWrapperInstances[index].first;
+}
+
+QMutex *getMutex(int64_t index) {
+    return restWrapperInstances[index].second;
+}
+
 void deleteQtRestWrapperInstance(int64_t index)
 {
     QMutexLocker lock(&mCreateInstances);
     using QtRestWrapper::QRestWrapper;
-    QMutexLocker lock2(restWrapperInstances[index].second);
-    QRestWrapper *newInstance = restWrapperInstances[index].first;
+    QMutexLocker lock2(getMutex(index));
+    QRestWrapper *newInstance = getInstance(index);
     newInstance->deleteLater();
     restWrapperInstances.erase(index);
     lock2.unlock();
-    delete restWrapperInstances[index].second;
+    delete getMutex(index);
     lock.unlock();
 }
 
 #define executeFunction(index, function, ...) \
     QMutexLocker lock(&mCreateInstances); \
     using QtRestWrapper::QRestWrapper; \
-    QRestWrapper *newInstance = restWrapperInstances[index].first; \
-    QMutexLocker lock2(restWrapperInstances[index].second); \
+    QRestWrapper *newInstance = getInstance(index); \
+    QMutexLocker lock2(getMutex(index)); \
     newInstance->function(__VA_ARGS__); \
     lock2.unlock(); \
     lock.unlock();
@@ -48,8 +61,8 @@ void deleteQtRestWrapperInstance(int64_t index)
 #define executeFunction2(index, function, ...) \
     QMutexLocker lock(&mCreateInstances); \
     using QtRestWrapper::QRestWrapper; \
-    QRestWrapper *newInstance = restWrapperInstances[index].first; \
-    QMutexLocker lock2(restWrapperInstances[index].second); \
+    QRestWrapper *newInstance = getInstance(index); \
+    QMutexLocker lock2(getMutex(index)); \
     auto returnValue = newInstance->function(__VA_ARGS__); \
     lock2.unlock(); \
     lock.unlock(); \
@@ -75,15 +88,65 @@ void authenticate(int64_t index)
     executeFunction(index, authenticate);
 }
 
-void registerAddWebView(int64_t index, void (*ptr)(void *))
-{
+template <typename Func1, typename Func2>
+void registerPtr(int64_t index, Func1 signal, Func2 ptr) {
     QMutexLocker lock(&mCreateInstances);
     using QtRestWrapper::QRestWrapper;
-    QRestWrapper *newInstance = restWrapperInstances[index].first;
-    QMutexLocker lock2(restWrapperInstances[index].second);
-    newInstance->connect(newInstance, &QRestWrapper::addWebView, [ptr](QWidget *widget) {
-        ptr(widget);
-    });
+    QRestWrapper *newInstance = getInstance(index);
+    QMutexLocker lock2(getMutex(index));
+    newInstance->connect(newInstance, signal, ptr);
     lock2.unlock();
     lock.unlock();
+}
+
+void registerAddWebView(int64_t index, void (*ptr)(void *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::addWebView, ptr);
+}
+
+void registerClosed(int64_t index, void (*ptr)())
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::closed, ptr);
+}
+
+void registerAuthenticated(int64_t index, void (*ptr)(struct qurlCAPI *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::authenticated, [ptr](const QUrl &url) {
+        ptr(qurlCapiFromString(nullptr, url.toString().toUtf8().data()));
+    });
+}
+
+void registerAuthenticatedContent(int64_t index, void (*ptr)(struct qurlCAPI *, const char *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::authenticatedContent, [ptr](const QUrl &url, const QByteArray &content) {
+        ptr(qurlCapiFromString(nullptr, url.toString().toUtf8().data()), content.data());
+    });
+}
+
+void registerAuthenticationCheck(int64_t index, bool (*ptr)(struct qurlCAPI *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::authenticationCheck, [ptr](const QUrl &url) -> bool {
+        return ptr(qurlCapiFromString(nullptr, url.toString().toUtf8().data()));
+    });
+}
+
+void registerAuthenticationCheckContent(int64_t index, bool (*ptr)(struct qurlCAPI *, const char *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::authenticationCheckContent, [ptr](const QUrl &url, const QByteArray &content) -> bool {
+        return ptr(qurlCapiFromString(nullptr, url.toString().toUtf8().data()), content.data());
+    });
+}
+
+void registerCertificateError(int64_t index, bool (*ptr)(struct QRestWrapperCertificateError_CAPI *))
+{
+    using QtRestWrapper::QRestWrapper;
+    registerPtr(index, &QRestWrapper::certificateError, [ptr](const QRestWrapperCertificateError &error) -> bool {
+        return ptr(qRestWrapperCertificateErrorCapiFromQRestWrapperCertificateError(error));
+    });
 }
