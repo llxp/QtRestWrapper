@@ -68,24 +68,61 @@ void deleteQtRestWrapperInstance(int64_t index)
     lock.unlock(); \
     return returnValue;
 
+template<typename T, typename ...Rest>
+auto callFunction(int64_t index, T function, Rest... rest) {
+    QMutexLocker lock(&mCreateInstances);
+    using QtRestWrapper::QRestWrapper;
+    QRestWrapper *newInstance = getInstance(index);
+    QMutexLocker lock2(getMutex(index));
+    (*newInstance.*function)(rest...);
+    lock2.unlock();
+    lock.unlock();
+}
+
+template<typename T, typename ...Rest>
+auto callFunction2(int64_t index, T function, Rest... rest) {
+    QMutexLocker lock(&mCreateInstances);
+    using QtRestWrapper::QRestWrapper;
+    QRestWrapper *newInstance = getInstance(index);
+    QMutexLocker lock2(getMutex(index));
+    auto returnValue = (*newInstance.*function)(rest...);
+    lock2.unlock();
+    lock.unlock();
+    return returnValue;
+}
+
 void setStoragePath(int64_t index, const char *path, int length)
 {
-    executeFunction(index, setStoragePath, QString::fromUtf8(path, length));
+    callFunction(index, &QtRestWrapper::QRestWrapper::setStoragePath, QString::fromUtf8(path, length));
+    //executeFunction(index, setStoragePath, QString::fromUtf8(path, length));
 }
 
 void setAuthenticationTestUrl(int64_t index, const char *url, int length)
 {
-    executeFunction(index, setAuthenticationTestUrl, QUrl(QString::fromUtf8(url, length)));
+    callFunction(index, &QtRestWrapper::QRestWrapper::setAuthenticationTestUrl, QUrl(QString::fromUtf8(url, length)));
+    //executeFunction(index, setAuthenticationTestUrl, QUrl(QString::fromUtf8(url, length)));
 }
 
 void setApplicationUrl(int64_t index, const char *url, int length)
 {
-    executeFunction(index, setApplicationUrl, QUrl(QString::fromUtf8(url, length)));
+    callFunction(index, &QtRestWrapper::QRestWrapper::setApplicationUrl, QUrl(QString::fromUtf8(url, length)));
+    //executeFunction(index, setApplicationUrl, QUrl(QString::fromUtf8(url, length)));
 }
 
 void authenticate(int64_t index)
 {
-    executeFunction(index, authenticate);
+    callFunction(index, &QtRestWrapper::QRestWrapper::authenticate);
+    //executeFunction(index, authenticate);
+}
+
+void runJavaScript(int64_t index, const char *scriptSource, int length)
+{
+    callFunction(index, &QtRestWrapper::QRestWrapper::runJavaScript, QString::fromUtf8(scriptSource, length));
+}
+
+void runJavaScriptSynchronous(int64_t index, const char *scriptSource, int length)
+{
+    return callFunction(index, &QtRestWrapper::QRestWrapper::runJavaScriptSynchronous, QString::fromUtf8(scriptSource, length));
 }
 
 template <typename Func1, typename Func2>

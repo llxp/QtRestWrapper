@@ -12,6 +12,8 @@ QTRESTWRAPPERCAPISHARED_EXPORT void setStoragePath(int64_t index, const char *pa
 QTRESTWRAPPERCAPISHARED_EXPORT void setAuthenticationTestUrl(int64_t index, const char *url, int length);
 QTRESTWRAPPERCAPISHARED_EXPORT void setApplicationUrl(int64_t index, const char *url, int length);
 QTRESTWRAPPERCAPISHARED_EXPORT void authenticate(int64_t index);
+QTRESTWRAPPERCAPISHARED_EXPORT void runJavaScript(int64_t index, const char *scriptSource, int length);
+QTRESTWRAPPERCAPISHARED_EXPORT void runJavaScriptSynchronous(int64_t index, const char *scriptSource, int length);
 
 QTRESTWRAPPERCAPISHARED_EXPORT void registerAddWebView(int64_t index, void (*ptr)(void *));
 QTRESTWRAPPERCAPISHARED_EXPORT void registerClosed(int64_t index, void (*ptr)());
