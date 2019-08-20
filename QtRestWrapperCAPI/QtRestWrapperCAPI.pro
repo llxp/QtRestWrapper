@@ -7,6 +7,19 @@
 QT       += core webenginewidgets widgets
 QT       -= gui
 
+Release:DESTDIR = release
+Debug:DESTDIR = debug
+
+Release:OBJECTS_DIR = release/.obj
+Release:MOC_DIR = release/.moc
+Release:RCC_DIR = release/.rcc
+Release:UI_DIR = release/.ui
+
+Debug:OBJECTS_DIR = debug/.obj
+Debug:MOC_DIR = debug/.moc
+Debug:RCC_DIR = debug/.rcc
+Debug:UI_DIR = debug/.ui
+
 TARGET = QtRestWrapperCAPI
 TEMPLATE = lib
 
@@ -29,8 +42,10 @@ SOURCES += \
         qtrestwrappercapi.cpp
 
 HEADERS += \
+        c_structures/map_capi.h \
         c_structures/qrestwrappercertificateerror_c.h \
         c_structures/qurl_c.h \
+        c_structures/qvariant_capi.h \
         qtrestwrappercapi.h \
         qtrestwrappercapi_global.h 
 
@@ -40,4 +55,8 @@ unix {
 }
 
 INCLUDEPATH += ../QtRestWrapper/include
-LIBS += -L../build-QtRestWrapper-Desktop_Qt_5_13_0_MSVC2017_64bit-Debug/debug -lQtRestWrapper
+LIBS += -L../../QtRestWrapper/bin -lQtRestWrapper
+
+INCLUDEPATH += "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt"
+LIBS += -L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17134.0/ucrt/x64"
+LIBS += -L"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\um\x64"

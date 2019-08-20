@@ -8,6 +8,6 @@ struct qurlCAPI {
     char *urlData;
 };
 
-QTRESTWRAPPERCAPISHARED_EXPORT struct qurlCAPI *qurlCapiFromString(struct qurlCAPI *qurl_obj, char *url);
+QTRESTWRAPPERCAPISHARED_EXPORT struct qurlCAPI qurlCapiFromString(char *url);
 
 #endif // QURL_C_H

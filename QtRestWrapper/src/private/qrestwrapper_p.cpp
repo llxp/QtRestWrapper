@@ -84,14 +84,9 @@ void QRestWrapperPrivate::sendDeleteRequest(const QUrl &url, const QSharedPointe
     m_networkHandler->sendRequest(url, payload, "DELETE", contentType, header);
 }
 
-void QRestWrapperPrivate::sendOptionsRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header)
+void QRestWrapperPrivate::sendOptionsRequest(const QUrl &url, const QMap<QString, QString> &header)
 {
-    m_networkHandler->sendRequest(url, QSharedPointer<QByteArray>::create(payload), "OPTIONS", contentType, header);
-}
-
-void QRestWrapperPrivate::sendOptionsRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &contentType, const QMap<QString, QString> &header)
-{
-    m_networkHandler->sendRequest(url, payload, "OPTIONS", contentType, header);
+    m_networkHandler->sendRequest(url, QSharedPointer<QByteArray>::create(""), "OPTIONS", "", header);
 }
 
 void QRestWrapperPrivate::sendPostRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header)

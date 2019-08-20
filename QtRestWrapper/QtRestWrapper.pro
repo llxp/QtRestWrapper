@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += widgets webenginewidgets core
+QT       += gui widgets webengine webenginewidgets core
 
-QT       -= gui
+#QT       -= gui
 
 TARGET = QtRestWrapper
 TEMPLATE = lib
@@ -55,3 +55,6 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+INCLUDEPATH += "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt"
+LIBS += -L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17134.0/ucrt/x64"

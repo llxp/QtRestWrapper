@@ -24,10 +24,10 @@ struct QRestWrapperCertificateError_CAPI
     Error_CAPI m_error;
     char *m_errorDescription;
     bool m_isOverridable;
-    struct qurlCAPI *m_url;
+    struct qurlCAPI m_url;
 };
 
 class QRestWrapperCertificateError;
-struct QRestWrapperCertificateError_CAPI *qRestWrapperCertificateErrorCapiFromQRestWrapperCertificateError(const QRestWrapperCertificateError & qRestWrapperCertificateError);
+struct QRestWrapperCertificateError_CAPI qRestWrapperCertificateErrorCapiFromQRestWrapperCertificateError(const QRestWrapperCertificateError & qRestWrapperCertificateError);
 
 #endif // QRESTWRAPPERCERTIFICATEERROR_C_H

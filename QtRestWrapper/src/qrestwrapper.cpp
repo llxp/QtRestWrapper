@@ -94,16 +94,10 @@ void QRestWrapper::sendDeleteRequest(const QUrl &url, const QSharedPointer<QByte
     d->sendDeleteRequest(url, payload, contentType, header);
 }
 
-void QRestWrapper::sendOptionsRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header)
+void QRestWrapper::sendOptionsRequest(const QUrl &url, const QMap<QString, QString> &header)
 {
     Q_D(QRestWrapper);
-    d->sendOptionsRequest(url, payload, contentType, header);
-}
-
-void QRestWrapper::sendOptionsRequest(const QUrl &url, const QSharedPointer<QByteArray> &payload, const QString &contentType, const QMap<QString, QString> &header)
-{
-    Q_D(QRestWrapper);
-    d->sendOptionsRequest(url, payload, contentType, header);
+    d->sendOptionsRequest(url, header);
 }
 
 void QRestWrapper::sendPostRequest(const QUrl &url, const QByteArray &payload, const QString &contentType, const QMap<QString, QString> &header)
