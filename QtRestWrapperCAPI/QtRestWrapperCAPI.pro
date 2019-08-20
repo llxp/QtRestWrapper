@@ -43,6 +43,7 @@ SOURCES += \
 
 HEADERS += \
         c_structures/map_capi.h \
+        c_structures/qnetworkcookie_capi.h \
         c_structures/qrestwrappercertificateerror_c.h \
         c_structures/qurl_c.h \
         c_structures/qvariant_capi.h \

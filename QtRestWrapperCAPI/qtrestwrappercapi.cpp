@@ -169,8 +169,7 @@ void registerAuthenticated(int64_t index, void (*ptr)(struct qurlCAPI))
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::authenticated, [ptr](const QUrl &url) {
-        QByteArray urlData = url.toString().toUtf8();
-        ptr(qurlCapiFromString(urlData.data()));
+        ptr(qurlCapiFromString(url.toString().toUtf8().data()));
     });
 }
 
@@ -178,8 +177,7 @@ void registerAuthenticatedContent(int64_t index, void (*ptr)(struct qurlCAPI, co
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::authenticatedContent, [ptr](const QUrl &url, const QByteArray &content) {
-        QByteArray urlData = url.toString().toUtf8();
-        ptr(qurlCapiFromString(urlData.data()), content.data());
+        ptr(qurlCapiFromString(url.toString().toUtf8().data()), content.data());
     });
 }
 
@@ -187,8 +185,7 @@ void registerAuthenticationCheck(int64_t index, bool (*ptr)(struct qurlCAPI))
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::authenticationCheck, [ptr](const QUrl &url) -> bool {
-        QByteArray urlData = url.toString().toUtf8();
-        return ptr(qurlCapiFromString(urlData.data()));
+        return ptr(qurlCapiFromString(url.toString().toUtf8().data()));
     });
 }
 
@@ -196,8 +193,7 @@ void registerAuthenticationCheckContent(int64_t index, bool (*ptr)(struct qurlCA
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::authenticationCheckContent, [ptr](const QUrl &url, const QByteArray &content) -> bool {
-        QByteArray urlData = url.toString().toUtf8();
-        return ptr(qurlCapiFromString(urlData.data()), content.data());
+        return ptr(qurlCapiFromString(url.toString().toUtf8().data()), content.data());
     });
 }
 
@@ -225,8 +221,7 @@ void registerContentReady(int64_t index, void (*ptr)(const qurlCAPI, const char 
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::contentReady, [ptr](const QUrl &url, const QByteArray &content) {
-        QByteArray urlData = url.toString().toUtf8();
-        ptr(qurlCapiFromString(urlData.data()), content.data());
+        ptr(qurlCapiFromString(url.toString().toUtf8().data()), content.data());
     });
 }
 
@@ -234,8 +229,7 @@ void registerAuthenticationFailure(int64_t index, void (*ptr)(const qurlCAPI, co
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::authenticationFailure, [ptr](const QUrl &url, const QByteArray &content, int statusCode) {
-        QByteArray urlData = url.toString().toUtf8();
-        ptr(qurlCapiFromString(urlData.data()), content.data(), statusCode);
+        ptr(qurlCapiFromString(url.toString().toUtf8().data()), content.data(), statusCode);
     });
 }
 
@@ -243,8 +237,7 @@ void registerNotFound(int64_t index, void (*ptr)(struct qurlCAPI, const char *))
 {
     using QtRestWrapper::QRestWrapper;
     registerPtr(index, &QRestWrapper::notFound, [ptr](const QUrl &url, const QByteArray &content) {
-        QByteArray urlData = url.toString().toUtf8();
-        return ptr(qurlCapiFromString(urlData.data()), content.data());
+        return ptr(qurlCapiFromString(url.toString().toUtf8().data()), content.data());
     });
 }
 
@@ -378,15 +371,124 @@ void clearAllCookies(int64_t index)
     callFunction(index, &QtRestWrapper::QRestWrapper::clearAllCookies);
 }
 
-const char **getOriginalCookieStringsByName(int64_t index, const char *cookieName)
-{
-    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByName, QString::fromUtf8(cookieName));
+const char **convertStringArrayToCharArray(const QVector<QString> &stringArray) {
     std::vector<const char *> *ptrs = new std::vector<const char *>();
-    for(auto str: ret) {
+    for(const auto &str: stringArray) {
         char *buffer = static_cast<char *>(malloc(sizeof(char) * static_cast<size_t>(str.length()) + 1));
         strcpy_s(buffer, static_cast<size_t>(str.length()), str.toUtf8().data());
         buffer[str.length()] = '\0';
         ptrs->push_back(buffer);
     }
     return ptrs->data();
+}
+
+const char **getOriginalCookieStringsByName(int64_t index, const char *cookieName)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByName, QString::fromUtf8(cookieName));
+    return convertStringArrayToCharArray(ret);
+}
+
+const char **getOriginalCookieStringsByDomain(int64_t index, const char *cookieDomain)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByDomain, QString::fromUtf8(cookieDomain));
+    return convertStringArrayToCharArray(ret);
+}
+
+const char **getOriginalCookieStringsByPath(int64_t index, const char *cookiePath)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByPath, QString::fromUtf8(cookiePath));
+    return convertStringArrayToCharArray(ret);
+}
+
+const char **getOriginalCookieStringsByNameAndDomain(int64_t index, const char *cookieName, const char *cookieDomain)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByNameAndDomain, QString::fromUtf8(cookieName), QString::fromUtf8(cookieDomain));
+    return convertStringArrayToCharArray(ret);
+}
+
+const char **getOriginalCookieStringsByNameAndDomainAndPath(int64_t index, const char *cookieName, const char *cookieDomain, const char *cookiePath)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getOriginalCookieStringsByNameAndDomainAndPath, QString::fromUtf8(cookieName), QString::fromUtf8(cookieDomain), QString::fromUtf8(cookiePath));
+    return convertStringArrayToCharArray(ret);
+}
+
+const char **getAllCookieStrings(int64_t index)
+{
+    QVector<QString> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getAllCookieStrings);
+    return convertStringArrayToCharArray(ret);
+}
+
+const char *randomString(int length)
+{
+    QMutexLocker lock(&mCreateInstances);
+    auto returnValue = QtRestWrapper::QRestWrapper::randomString(length);
+    lock.unlock();
+    return returnValue.toUtf8().data();
+}
+
+requestHeader cookieSplit(const char *cookieString)
+{
+    QMap<QString, QString> returnValue = QtRestWrapper::QRestWrapper::cookieSplit(QString::fromUtf8(cookieString));
+    requestHeader splitted;
+    splitted.nodesCount = static_cast<size_t>(returnValue.count());
+    splitted.nodes = static_cast<requestHeaderNode *>(calloc(splitted.nodesCount, sizeof(requestHeaderNode)));
+    size_t i = 0;
+    for(QMap<QString, QString>::iterator it = returnValue.begin(); it != returnValue.end(); ++it, ++i) {
+        splitted.nodes[i].name = static_cast<char *>(malloc(sizeof(char) * static_cast<size_t>(it.key().toUtf8().length()) + 1));
+        splitted.nodes[i].value = static_cast<char *>(malloc(sizeof(char) * static_cast<size_t>(it.value().toUtf8().length()) + 1));
+        strcpy_s(splitted.nodes[i].name, static_cast<size_t>(it.key().toUtf8().length()), it.key().toUtf8().data());
+        strcpy_s(splitted.nodes[i].value, static_cast<size_t>(it.value().toUtf8().length()), it.value().toUtf8().data());
+        splitted.nodes[i].name[static_cast<size_t>(it.key().toUtf8().length())] = '\0';
+        splitted.nodes[i].value[static_cast<size_t>(it.value().toUtf8().length())] = '\0';
+    }
+    return splitted;
+}
+
+qnetworkcookieListCAPI convertQnetworkCookieListToQnetworkCookieListCAPI(const QVector<QNetworkCookie> &cookieList) {
+    qnetworkcookieListCAPI cookies;
+    cookies.cookieCount = static_cast<size_t>(cookieList.count());
+    cookies.cookies = static_cast<qnetworkcookieCAPI *>(calloc(cookies.cookieCount, sizeof(qnetworkcookieCAPI)));
+    size_t i = 0;
+    for (const QNetworkCookie &cookie : cookieList) {
+        cookies.cookies[i].value = static_cast<char *>(malloc(sizeof(char) * static_cast<size_t>(cookie.toRawForm().length()) + 1));
+        strcpy_s(cookies.cookies[i].value, static_cast<size_t>(cookie.toRawForm().length()), cookie.toRawForm().data());
+        cookies.cookies[i].value[static_cast<size_t>(cookie.toRawForm().length())] = '\0';
+    }
+    return cookies;
+}
+
+qnetworkcookieListCAPI getCookiesByName(int64_t index, const char *cookieName)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getCookiesByName, QString::fromUtf8(cookieName));
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
+}
+
+qnetworkcookieListCAPI getCookiesByDomain(int64_t index, const char *cookieDomain)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getCookiesByDomain, QString::fromUtf8(cookieDomain));
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
+}
+
+qnetworkcookieListCAPI getCookiesByPath(int64_t index, const char *cookiePath)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getCookiesByPath, QString::fromUtf8(cookiePath));
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
+}
+
+qnetworkcookieListCAPI getCookiesByNameAndDomain(int64_t index, const char *cookieName, const char *cookieDomain)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getCookiesByNameAndDomain, QString::fromUtf8(cookieName), QString::fromUtf8(cookieDomain));
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
+}
+
+qnetworkcookieListCAPI getCookiesByNameAndDomainAndPath(int64_t index, const char *cookieName, const char *cookieDomain, const char *cookiePath)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getCookiesByNameAndDomainAndPath, QString::fromUtf8(cookieName), QString::fromUtf8(cookieDomain), QString::fromUtf8(cookiePath));
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
+}
+
+qnetworkcookieListCAPI getAllCookies(int64_t index)
+{
+    QVector<QNetworkCookie> ret = callFunction2(index, &QtRestWrapper::QRestWrapper::getAllCookies);
+    return convertQnetworkCookieListToQnetworkCookieListCAPI(ret);
 }

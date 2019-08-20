@@ -6,6 +6,7 @@
 #include <c_structures/qurl_c.h>
 #include <c_structures/qrestwrappercertificateerror_c.h>
 #include <c_structures/qvariant_capi.h>
+#include <c_structures/qnetworkcookie_capi.h>
 
 struct requestHeaderNode {
     char *name;
@@ -41,12 +42,12 @@ QTRESTWRAPPERCAPISHARED_EXPORT void deleteCookiesByNameAndDomainAndPath(int64_t 
 QTRESTWRAPPERCAPISHARED_EXPORT void clearAllCookies(int64_t index);
 
 // methods to get cookies by identifiers
-/*QVector<QNetworkCookie> getCookiesByName(const char *cookieName) const;
-QVector<QNetworkCookie> getCookiesByDomain(const char *cookieDomain) const;
-QVector<QNetworkCookie> getCookiesByPath(const char *cookiePath) const;
-QVector<QNetworkCookie> getCookiesByNameAndDomain(const char *cookieName, const char *cookieDomain) const;
-QVector<QNetworkCookie> getCookiesByNameAndDomainAndPath(const char *cookieName, const char *cookieDomain, const char *cookiePath) const;
-QVector<QNetworkCookie> getAllCookies() const;*/
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getCookiesByName(int64_t index, const char *cookieName);
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getCookiesByDomain(int64_t index, const char *cookieDomain);
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getCookiesByPath(int64_t index, const char *cookiePath);
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getCookiesByNameAndDomain(int64_t index, const char *cookieName, const char *cookieDomain);
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getCookiesByNameAndDomainAndPath(int64_t index, const char *cookieName, const char *cookieDomain, const char *cookiePath);
+QTRESTWRAPPERCAPISHARED_EXPORT qnetworkcookieListCAPI getAllCookies(int64_t index);
 
 // methods to get the raw cookie strings by identifiers
 QTRESTWRAPPERCAPISHARED_EXPORT const char **getOriginalCookieStringsByName(int64_t index, const char *cookieName);
