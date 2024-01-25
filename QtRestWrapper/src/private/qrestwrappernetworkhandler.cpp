@@ -87,7 +87,6 @@ void QRestWrapperNetworkHandler::sendRequest(const QUrl &url, const QSharedPoint
         request.setRawHeader(it.key().toUtf8(), it->toUtf8());
     }
 
-    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
     QString registeredString = QRestWrapperUtils::randomString();
     m_registeredPayloadData[registeredString] = QPair<QString, QSharedPointer<QByteArray>>(contentType, payload);
     m_registeredCustomHeaders[registeredString] = header;
@@ -116,7 +115,6 @@ void QRestWrapperNetworkHandler::waitForCustomRequest(QNetworkReply *reply)
         case 308: {
             // redirect requested
             QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-            QUrl redirectUrl;
             if(!possibleRedirectUrl.isNull() && possibleRedirectUrl.isValid() && possibleRedirectUrl != reply->request().url()) {
                 QVariant customVerb = reply->request().attribute(QNetworkRequest::CustomVerbAttribute);
                 sendRequest(possibleRedirectUrl.toUrl(),
