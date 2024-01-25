@@ -1,6 +1,7 @@
 #include "../../include/private/qrestwrapperutils.h"
 
 #include <QVector>
+#include <QRandomGenerator>
 
 using QtRestWrapper::QRestWrapperUtils;
 
@@ -29,7 +30,8 @@ QString QRestWrapperUtils::randomString(int length)
     while(m_generatedRandomStrings.contains(randomString)) {
         randomString = "";
         for (int i=0; i<length; ++i) {
-            int index = qrand() % possibleCharactersLength;
+            auto rnd = QRandomGenerator::global()->generate();
+            int index = rnd % possibleCharactersLength;
             QChar nextChar = possibleCharacters[index];
             randomString.append(nextChar);
         }

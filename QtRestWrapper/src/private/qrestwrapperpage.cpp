@@ -16,6 +16,7 @@ QRestWrapperPage::QRestWrapperPage(QObject *parent)
     profile()->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
     //settings()->setAttribute(QWebEngineSettings::AutoLoadImages, false);
     //settings()->setAttribute(QWebEngineSettings::AutoLoadIconsForPage, false);
+    QObject::connect(this, &QWebEnginePage::certificateError, this, &QRestWrapperPage::certificateError);
 }
 
 QRestWrapperPage::~QRestWrapperPage()
@@ -24,14 +25,14 @@ QRestWrapperPage::~QRestWrapperPage()
     qDebug() << __FUNCTION__;
     //profile()->setParent(nullptr);
     profile()->disconnect();
-    profile()->setRequestInterceptor(nullptr);
+    profile()->setUrlRequestInterceptor(nullptr);
     //delete profile();
     //profile()->deleteLater();
 }
 
 void QRestWrapperPage::setRequestInterceptor(QWebEngineUrlRequestInterceptor *requestInterceptor)
 {
-    profile()->setRequestInterceptor(requestInterceptor);
+    profile()->setUrlRequestInterceptor(requestInterceptor);
 }
 
 void QRestWrapperPage::setCachePath(const QString &path)
@@ -104,10 +105,15 @@ void QRestWrapperPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsol
     }
 }
 
-bool QRestWrapperPage::certificateError(const QWebEngineCertificateError &certificateError)
+void QRestWrapperPage::certificateErrorHandler(const QWebEngineCertificateError &certificateError)
 {
     qDebug() << __FUNCTION__;
-    QRestWrapperCertificateError::Error newError = static_cast<QRestWrapperCertificateError::Error>(certificateError.error());
-    QRestWrapperCertificateError error(newError, certificateError.errorDescription(), certificateError.isOverridable(), certificateError.url());
-    return emit certificateErrorSignal(error);
+    QRestWrapperCertificateError::Error newError = static_cast<QRestWrapperCertificateError::Error>(certificateError.type());
+    QRestWrapperCertificateError error(newError, certificateError.description(), certificateError.isOverridable(), certificateError.url());
+    auto mutableError = const_cast<QWebEngineCertificateError&>(certificateError);
+    if (emit certificateErrorSignal(error)) {
+        mutableError.acceptCertificate();
+    } else {
+        mutableError.rejectCertificate();
+    }
 }

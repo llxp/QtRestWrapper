@@ -108,6 +108,7 @@ protected:
     TempWidget *m_tempWidget;
     QRestWrapperPage *m_page;
     QWebEngineCookieStore *m_cookieStore;
+
     QUrl m_authenticationTestUrl;
     QUrl m_applicationUrl;
     bool m_isAuthenticated;

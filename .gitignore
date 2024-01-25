@@ -30,3 +30,22 @@
 *.exe
 *.out
 *.app
+
+# qt shadow build directories
+build-*/
+
+# bin directory
+bin/
+
+# obj directory
+obj/
+
+# output directory
+output/
+
+# qt .pro.user files
+*.pro.user
+*.pro.user.*
+
+# .qmake.stash
+*.qmake.stash

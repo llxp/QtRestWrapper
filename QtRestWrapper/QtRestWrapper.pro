@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += gui widgets webengine webenginewidgets core
+QT       += gui widgets webenginewidgets core
 
 #QT       -= gui
 

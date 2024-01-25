@@ -23,7 +23,12 @@ public:
         CertificateWeakSignatureAlgorithm = -208,
         CertificateNonUniqueName = -210,
         CertificateWeakKey = -211,
-        CertificateNameConstraintViolation = -212
+        CertificateNameConstraintViolation = -212,
+        CertificateValidityTooLong = -213,
+        CertificateTransparencyRequired = -214,
+        CertificateSymantecLegacy = -215,
+        CertificateKnownInterceptionBlocked = -217,
+        SslObsoleteVersion = -218,
     };
 public:
     QRestWrapperCertificateError(){}
